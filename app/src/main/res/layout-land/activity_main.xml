@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#32d8c1"
+    tools:context="com.pujolsluis.android.hangeo.MainActivity">
+
+        <ImageView
+            android:layout_alignParentTop="true"
+            android:paddingTop="40dp"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:src="@drawable/hangeo_app_land"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/splash_screen_description"
+            />
+        <TextView
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="130dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/center_textView"
+            android:background="#4dd0e1"
+            android:padding="15dp"
+            android:textAlignment="center"
+            />
+</RelativeLayout>
