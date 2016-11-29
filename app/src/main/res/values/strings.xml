@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Hangeo</string>
     <string name="center_textView">Under Development. . .</string>
+    <string name="splash_screen_description">Hangeo under developement splash screen</string>
 </resources>

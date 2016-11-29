@@ -30,6 +30,7 @@
             android:layout_width="match_parent"
             android:src="@drawable/hangeo_app"
             android:scaleType="centerCrop"
+            android:contentDescription="@string/splash_screen_description"
             />
     </LinearLayout>
 </RelativeLayout>

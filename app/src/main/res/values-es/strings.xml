@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hangeo</string>
+    <string name="center_textView">En Desarrollo. . .</string>
+    <string name="splash_screen_description">Fondo para pantalla modo \'En Desarrollo\'</string>
+</resources>
