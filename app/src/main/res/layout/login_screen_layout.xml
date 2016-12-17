@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/ImageView_LoginScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/hangeo_app_land"
+            android:scaleType="centerCrop"/>
+
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/lLoginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/lLoginButton">
+        android:layout_centerInParent="true"
+        >
 
         <EditText
             android:layout_width="match_parent"
@@ -25,20 +45,27 @@
             android:ems="10"
             android:id="@+id/editText2"
             android:hint="Password" />
-
-
-
     </LinearLayout>
 
     <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
+        android:id="@+id/b_sLogin_Login"
+        android:text="Login"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/lLoginButton"
         android:padding="10dp"
         android:textColor="@color/colorAccent"
         android:layout_centerHorizontal="true"
-        android:id="@+id/b_sLogin_Login" />
+         />
+
+    <TextView
+        android:id="@+id/login_screen_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/signup_option_string"
+        android:layout_below="@id/b_sLogin_Login"
+        android:gravity="center_horizontal"
+        />
 
 
 </RelativeLayout>

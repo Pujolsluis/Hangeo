@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             style="?android:attr/borderlessButtonStyle"
-            android:textColor="@color/colorWelcomeFont"
+            android:textColor="@color/colorWelcomeScreenFont"
             android:background="@color/colorAccent"
             android:text="Login" />
 
@@ -29,7 +29,7 @@
             android:layout_weight="1"
             style="?android:attr/borderlessButtonStyle"
             android:background="@color/colorPrimary"
-            android:textColor="@color/colorWelcomeFont"
+            android:textColor="@color/colorWelcomeScreenFont"
             android:text="Sign Up" />
     </LinearLayout>
 
