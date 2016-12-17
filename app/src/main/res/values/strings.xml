@@ -1,6 +1,15 @@
 <resources>
     <string name="app_name">Hangeo</string>
     <string name="center_textView">Under Development. . .</string>
-    <string name="splash_screen_description">Hangeo under developement splash screen</string>
-    <string name="signup_option_string">Cant login? <a href="http://somesite.com/">Create an account</a></string>
+    <string name="splash_screen_description">Hangeo under development splash screen</string>
+    <string name="signup_option_string">Can not login? <a href="http:adasdas.com">Create an account</a></string>
+    <string name="username_string">Username</string>
+    <string name="password_string">Password</string>
+    <string name="login_string">Login</string>
+    <string name="signup_welcome_screen"><b></b><h2>SIGN UP</h2></string>
+    <string name="login_welcome_screen">LOGIN</string>
+    <string name="email_string">Email</string>
+    <string name="register_string">Sign Up</string>
+    <string name="or">or</string>
+    <string name="register_signup_options">Sign up with social sites</string>
 </resources>

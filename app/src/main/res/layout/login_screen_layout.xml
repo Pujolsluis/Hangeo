@@ -36,7 +36,7 @@
             android:ems="10"
             android:id="@+id/editText"
             android:selectAllOnFocus="false"
-            android:hint="Username" />
+            android:hint="@string/username_string" />
 
         <EditText
             android:layout_width="match_parent"
@@ -44,12 +44,12 @@
             android:inputType="textEmailAddress"
             android:ems="10"
             android:id="@+id/editText2"
-            android:hint="Password" />
+            android:hint="@string/password_string" />
     </LinearLayout>
 
     <Button
         android:id="@+id/b_sLogin_Login"
-        android:text="Login"
+        android:text="@string/login_string"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/lLoginButton"
@@ -66,6 +66,5 @@
         android:layout_below="@id/b_sLogin_Login"
         android:gravity="center_horizontal"
         />
-
 
 </RelativeLayout>

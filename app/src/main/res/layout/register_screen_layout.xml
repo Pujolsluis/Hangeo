@@ -1,6 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/ImageView_LoginScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/hangeo_app_land"
+            android:scaleType="centerCrop"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/register_layout_inputs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        >
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/register_username_input"
+            android:selectAllOnFocus="false"
+            android:hint="@string/username_string" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/register_email_input"
+            android:hint="@string/email_string" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/register_password_input"
+            android:hint="@string/password_string" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/b_sRegister_register"
+        android:text="@string/register_string"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/register_layout_inputs"
+        android:padding="10dp"
+        android:textColor="@color/colorAccent"
+        android:layout_centerHorizontal="true"
+        />
+
+    <TextView
+        android:id="@+id/register_textview_ors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/or"
+        android:layout_below="@id/b_sRegister_register"
+        android:gravity="center_horizontal"
+        android:textColor="@color/colorWelcomeScreenFont"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:id="@+id/register_textview_signupoptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/register_signup_options"
+        android:layout_below="@id/register_textview_ors"
+        android:gravity="center_horizontal"
+        android:textColor="@color/colorWelcomeScreenFont"
+        android:textStyle="normal|bold" />
+
+    <LinearLayout
+        android:id="@+id/register_social_network_icons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/register_textview_signupoptions">
+
+        <ImageView
+            android:id="@+id/welcome_facebook_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_facebook"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"/>
+
+        <ImageView
+            android:id="@+id/welcome_googleplus_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_google_plus"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"/>
+
+        <ImageView
+            android:id="@+id/welcome_instagram_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_instagram"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

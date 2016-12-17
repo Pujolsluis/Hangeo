@@ -20,7 +20,9 @@
             style="?android:attr/borderlessButtonStyle"
             android:textColor="@color/colorWelcomeScreenFont"
             android:background="@color/colorAccent"
-            android:text="Login" />
+            android:text="@string/login_welcome_screen"
+            android:textStyle="normal|bold"
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/button_signUp"
@@ -30,7 +32,9 @@
             style="?android:attr/borderlessButtonStyle"
             android:background="@color/colorPrimary"
             android:textColor="@color/colorWelcomeScreenFont"
-            android:text="Sign Up" />
+            android:text="@string/signup_welcome_screen"
+            android:textStyle="normal|bold"
+            android:textSize="24sp" />
     </LinearLayout>
 
     <LinearLayout
