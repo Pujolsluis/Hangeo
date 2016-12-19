@@ -1,5 +1,7 @@
 package com.pujolsluis.android.hangeo;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -22,6 +24,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    Context context = this;
     private DrawerLayout mDrawerLayout;
 
     @Override
@@ -42,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
+
+        navigationView.setCheckedItem(R.id.nav_plans);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         if (viewPager != null) {
@@ -87,8 +92,12 @@ public class MainActivity extends AppCompatActivity {
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        mDrawerLayout.closeDrawers();
+                        switch (menuItem.getItemId()){
+                            case R.id.nav_home:
+                                Intent intent = new Intent(context, MapsActivity.class);
+                                mDrawerLayout.closeDrawer(GravityCompat.START);
+                                context.startActivity(intent);
+                        }
                         return true;
                     }
                 });

@@ -22,17 +22,17 @@
             android:icon="@drawable/ic_dashboard"
             android:title="Home" />
         <item
-            android:id="@+id/nav_messages"
+            android:id="@+id/nav_plans"
             android:icon="@drawable/ic_event"
-            android:title="Invitations" />
+            android:title="Plans" />
         <item
             android:id="@+id/nav_friends"
-            android:icon="@drawable/ic_headset"
-            android:title="Friends" />
+            android:icon="@drawable/ic_forum"
+            android:title="Invitations" />
         <item
             android:id="@+id/nav_discussion"
-            android:icon="@drawable/ic_forum"
-            android:title="Discussion" />
+            android:icon="@drawable/ic_headset"
+            android:title="Friends" />
     </group>
 
     <item android:title="Contact Us">
