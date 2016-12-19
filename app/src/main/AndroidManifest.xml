@@ -15,7 +15,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PlanDetailsActivity"></activity>
+        <activity android:name=".PlanDetailsActivity"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>
