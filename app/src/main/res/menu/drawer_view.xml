@@ -24,7 +24,7 @@
         <item
             android:id="@+id/nav_messages"
             android:icon="@drawable/ic_event"
-            android:title="Messages" />
+            android:title="Invitations" />
         <item
             android:id="@+id/nav_friends"
             android:icon="@drawable/ic_headset"
@@ -35,14 +35,14 @@
             android:title="Discussion" />
     </group>
 
-    <item android:title="Sub items">
+    <item android:title="Contact Us">
         <menu>
             <item
                 android:icon="@drawable/ic_dashboard"
-                android:title="Sub item 1" />
+                android:title="Hangeo.com" />
             <item
                 android:icon="@drawable/ic_forum"
-                android:title="Sub item 2" />
+                android:title="Support" />
         </menu>
     </item>
 
