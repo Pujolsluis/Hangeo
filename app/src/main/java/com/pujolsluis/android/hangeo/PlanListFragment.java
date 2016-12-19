@@ -39,7 +39,7 @@ public class PlanListFragment extends Fragment {
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(),
-                getRandomSublist(Plan.sPlanStrings, 30)));
+                getRandomSublist(Plan.sPlanStrings, 10),getRandomSublist(Plan.sPlanStrings, 10)));
     }
 
     private List<String> getRandomSublist(String[] array, int amount) {
@@ -57,6 +57,7 @@ public class PlanListFragment extends Fragment {
         private final TypedValue mTypedValue = new TypedValue();
         private int mBackground;
         private List<String> mValues;
+        private List<String> mValues2;
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public String mBoundString;
@@ -64,12 +65,14 @@ public class PlanListFragment extends Fragment {
             public final View mView;
             public final ImageView mImageView;
             public final TextView mTextView;
+            public final TextView mTextView2;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
                 mImageView = (ImageView) view.findViewById(R.id.avatar);
                 mTextView = (TextView) view.findViewById(android.R.id.text1);
+                mTextView2 = (TextView) view.findViewById(R.id.textView_plan_description);
             }
 
             @Override
@@ -82,10 +85,11 @@ public class PlanListFragment extends Fragment {
             return mValues.get(position);
         }
 
-        public SimpleStringRecyclerViewAdapter(Context context, List<String> items) {
+        public SimpleStringRecyclerViewAdapter(Context context, List<String> items, List<String> items2) {
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
             mBackground = mTypedValue.resourceId;
             mValues = items;
+            mValues2 = items2;
         }
 
         @Override
@@ -100,6 +104,7 @@ public class PlanListFragment extends Fragment {
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mBoundString = mValues.get(position);
             holder.mTextView.setText(mValues.get(position));
+            holder.mTextView2.setText(mValues2.get(position));
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override

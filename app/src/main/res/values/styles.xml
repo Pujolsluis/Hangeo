@@ -25,4 +25,19 @@
         <item name="android:orientation">vertical</item>
     </style>
 
+    <style name="PlanCardContent" parent="android:Widget">
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="CardContent_Title">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+    <style name="CardContent_SubTitle">
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+
 </resources>
