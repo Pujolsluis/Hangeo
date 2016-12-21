@@ -75,7 +75,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng sevendips = new LatLng(18.487438, -69.961872);
         mMap.addMarker(new MarkerOptions().position(sevendips).title("Marker in sevendips"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sevendips));
-        mMap.setMinZoomPreference(16);
+        mMap.setMinZoomPreference((float)16.5);
     }
 
     private void setupDrawerContent(final NavigationView navigationView) {
