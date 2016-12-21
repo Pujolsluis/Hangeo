@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#111111"
+    android:orientation="vertical"
+    tools:context="com.example.android.aboutus.MainActivity">
+
+    <LinearLayout
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:background="#32D8C1">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="36dp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:text="Soporte"/>
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="11"
+        android:background="#BBF12C">
+
+        <Button
+            android:text="Contáctanos"
+            android:padding="8sp"
+            android:textSize="34dp"
+            android:background="#FFFFFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+</LinearLayout>
