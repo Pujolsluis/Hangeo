@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBarOverlay">false</item>
     </style>
 
     <style name="Theme.DesignDemo" parent="Base.Theme.DesignDemo">
@@ -15,6 +16,7 @@
         <item name="colorPrimary">#673AB7</item>
         <item name="colorPrimaryDark">#512DA8</item>
         <item name="colorAccent">#FF4081</item>
+        <item name="windowActionBarOverlay">false</item>
     </style>
 
     <style name="Widget.CardContent" parent="android:Widget">
