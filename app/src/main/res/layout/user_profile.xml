@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="10"
+        >
+
+        <ImageView
+            android:id="@+id/user2"
+            android:layout_width="384dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/User2" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFF4444"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:text="Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="30sp"
+            android:paddingRight="20dp"
+            android:id="@+id/firstName"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            />
+
+        <TextView
+            android:text="Last_Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="30sp"
+            android:paddingRightt="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/lastName"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFF4444"
+        android:orientation="vertical"
+
+        >
+
+        <TextView
+            android:text="Email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:paddingRight="20dp"
+            android:id="@+id/Email"
+            android:layout_marginLeft="20dp"
+            />
+
+        <TextView
+            android:text="Address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:paddingRightt="20dp"
+            android:id="@+id/address"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="20dp"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:background="#FFFFFF"
+        android:orientation="horizontal"
+        >
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            >
+
+            <ImageButton
+                android:id="@+id/phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:paddingLeft="40dp"
+                android:paddingRight="20dp"
+                android:src="@drawable/Phone" />
+
+            <TextView
+                android:id="@+id/call"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:paddingRight="10dp"
+                android:textSize="25dp"
+                android:textColor="#000"
+                android:text="Call" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            >
+
+            <ImageButton
+                android:id="@+id/message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:paddingLeft="35dp"
+                android:paddingRight="24dp"
+                android:src="@drawable/New_Message" />
+
+            <TextView
+                android:id="@+id/message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:textSize="25dp"
+                android:textColor="#000"
+                android:text="Message" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            >
+
+            <ImageButton
+                android:background="#FFFFFF"
+                android:id="@+id/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:paddingRight="20dp"
+                android:src="@drawable/email" />
+
+            <TextView
+                android:id="@+id/call"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="30dp"
+                android:paddingRight="20dp"
+                android:textSize="25dp"
+                android:textColor="#000"
+                android:text="Email" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
