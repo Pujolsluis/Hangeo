@@ -65,6 +65,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<Marker> mLastMarkerslist = new ArrayList<>();
     private ArrayList<LatLng> mPolyLinePointList = new ArrayList<>();
 
+    //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(newBase);
@@ -147,6 +148,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.addMarker(new MarkerOptions().position(sevendips).title("Marker in sevendips"));
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(sevendips));
         mGoogleMap.setMinZoomPreference((float)16.5);
+        //Setting the correct Padding for the map ui
+        mGoogleMap.setPadding(16, 278, 16, 16);
     }
 
     private void setupDrawerContent(final NavigationView navigationView) {
@@ -185,6 +188,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.getResources();
     }
 
+    //Method that gets called when a place is selected from the search box
     @Override
     public void onPlaceSelected(Place place) {
         LatLng target = place.getLatLng();
@@ -205,6 +209,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    //Method that gets called when an error occurs with a place selected from the search box
     @Override
     public void onError(Status status) {
         return;
