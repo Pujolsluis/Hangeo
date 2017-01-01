@@ -34,6 +34,7 @@ import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener {
 
+    static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
     private DrawerLayout mDrawerLayout;
     Context context = this;
@@ -150,6 +151,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.setMinZoomPreference((float)16.5);
         //Setting the correct Padding for the map ui
         mGoogleMap.setPadding(16, 278, 16, 16);
+
+        //On Long Click Listener for map to set temporal marker
+        mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng point) {
+                //mGoogleMap.clear();
+                Log.d(LOG_TAG, "Hello you clicked me!");
+                MarkerOptions tempMarker = new MarkerOptions().position(point).title(getResources().getString(R.string.dropped_pin_text));
+                mLastMarker = mGoogleMap.addMarker(tempMarker);
+//                mLastMarkerslist.add(mLastMarker);
+//                mPolyLinePointList.add(mLastMarker.getPosition());
+//                mPolyLine.setPoints(mPolyLinePointList);
+                // updateCamera();
+            }
+        });
+
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+//                marker.remove();
+                marker.showInfoWindow();
+                return true;
+            }
+        });
     }
 
     private void setupDrawerContent(final NavigationView navigationView) {

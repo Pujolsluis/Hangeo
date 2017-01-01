@@ -13,8 +13,9 @@
 
     <string name="menu_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--Strings of the map activity-->
     <string name="title_activity_maps">Map</string>
+    <string name="dropped_pin_text">Dropped Pin</string>
+
     <!--End of PujolsLuis Strings-->
 </resources>
