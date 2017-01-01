@@ -2,4 +2,19 @@
     <string name="app_name">Hangeo</string>
     <string name="center_textView">Under Development. . .</string>
     <string name="splash_screen_description">Hangeo under developement splash screen</string>
+
+    <!--PujolsLuis Strings-->
+  <string name="plan_description_ipsum">Jarlsberg lancashire edam. Dolcelatte hard cheese brie st. agur blue
+    cheese caerphilly bavarian bergkase cheese and biscuits mascarpone. Cheeseburger swiss bavarian
+    bergkase cream cheese fromage frais cheesy feet port-salut airedale. St. agur blue cheese rubber
+    cheese caerphilly cheddar cheesecake cream cheese manchego lancashire. Roquefort squirty cheese
+    the big cheese.</string>
+    <string name="checkin">Checkin</string>
+
+    <string name="menu_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">Map</string>
+    <!--End of PujolsLuis Strings-->
 </resources>

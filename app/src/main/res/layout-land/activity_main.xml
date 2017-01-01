@@ -1,29 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#32d8c1"
-    tools:context="com.pujolsluis.android.hangeo.MainActivity">
 
-        <ImageView
-            android:layout_alignParentTop="true"
-            android:paddingTop="40dp"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:fitsSystemWindows="true">
+
+        <include layout="@layout/include_list_viewpager"/>
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view"
             android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:src="@drawable/hangeo_app_land"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/splash_screen_description"
-            />
-        <TextView
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="130dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/center_textView"
-            android:background="#4dd0e1"
-            android:padding="15dp"
-            android:textAlignment="center"
-            />
-</RelativeLayout>
+            android:layout_width="wrap_content"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/nav_header"
+            app:menu="@menu/drawer_view"/>
+
+</android.support.v4.widget.DrawerLayout>
