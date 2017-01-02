@@ -130,18 +130,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Initialize Sliding Panel
         initializeSlidingPanel();
 
-        final ImageButton addPlaceButton = (ImageButton) findViewById(R.id.add_location_to_plan);
-
-        addPlaceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
-                    addLocationWithDialog();
-                }else if(mLastMarker != null && mSelectedMarkersMap.containsKey(mLastMarker)){
-                    deleteLocationWithDialog();
-                }
-            }
-        });
 
 
     }
@@ -272,6 +260,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //This method initializes the sliding panel for the layout
     private void initializeSlidingPanel(){
 
+        //addPlaceButton of Panel initialization
+        final ImageButton addPlaceButton = (ImageButton) findViewById(R.id.add_location_to_plan);
+
+        addPlaceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
+                    addLocationWithDialog();
+                }else if(mLastMarker != null && mSelectedMarkersMap.containsKey(mLastMarker)){
+                    deleteLocationWithDialog();
+                }
+            }
+        });
+
         //Find Sliding Panel Root Layout element
         mSlidingPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         //Setting Panel with a anchor point in the middle of screen
@@ -293,6 +295,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
         });
+
+        //Setting the panel to be initially hidden
+        mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
     }
 
