@@ -26,12 +26,14 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -40,6 +42,8 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static com.pujolsluis.android.hangeo.R.id.map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener {
 
@@ -109,7 +113,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
         //Get Map Activity Layout
@@ -373,7 +377,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mSelectedMarkersMap.put(mLastMarker, mSelectedMarkersMap.size() + 1 );
                         mSelectedMarkerslist.add(mLastMarker);
                         mPolyLineSelectedPointList.add(mLastMarker.getPosition());
+
+                        //Updating Map Polyline
                         updatePolylineOfLocations();
+
+                        //Updating Bounds Builder for Map
+                        updateMapBounds();
+
+                        //Close Alert Dialog
                         dialog.cancel();
                     }
                 });
@@ -400,12 +411,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 "Delete",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //Adding marker to the map that contains all plan locations with its insertion order
+                        //Removing marker from list of locations in plan
                         mSelectedMarkersMap.remove(mLastMarker);
                         mSelectedMarkerslist.remove(mLastMarker);
                         mPolyLineSelectedPointList.remove(mLastMarker.getPosition());
                         mLastMarker.remove();
+
+                        //Updating Map Polyline
                         updatePolylineOfLocations();
+
+                        //Updating Map Bounds
+                        updateMapBounds();
                         dialog.cancel();
                     }
                 });
@@ -424,6 +440,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void updatePolylineOfLocations(){
         mPolyLine.setPoints(mPolyLineSelectedPointList);
+    }
+
+    private void updateMapBounds(){
+        LatLngBounds.Builder mMapLatLngBoundsBuilder = new LatLngBounds.Builder();
+
+        //Include points to consider for map Bounds
+        for(int i=0; i<mPolyLineSelectedPointList.size(); i++){
+            mMapLatLngBoundsBuilder.include(mPolyLineSelectedPointList.get(i));
+        }
+
+        //Create new Camera Update to indicate where to move camera
+        CameraUpdate newMapBounds=
+                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 48);
+
+        //Update Camera to new Bounds
+        mGoogleMap.moveCamera(newMapBounds);
     }
 
     @Override
