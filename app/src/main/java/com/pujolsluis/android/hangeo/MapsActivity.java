@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 
@@ -65,6 +66,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private ArrayList<Marker> mLastMarkerslist = new ArrayList<>();
     private ArrayList<LatLng> mPolyLinePointList = new ArrayList<>();
+
+    //Planel Layout
+    private SlidingUpPanelLayout mSlidingPanelLayout;
 
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
@@ -134,7 +138,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .bearing(0)
                 .build();
 
+        //Find Sliding Panel Root Layout element
+        mSlidingPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        //Setting Panel with a anchor point in the middle of screen
+        mSlidingPanelLayout.setAnchorPoint(0.7f);
+        mSlidingPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                Log.i(LOG_TAG, "onPanelSlide, offset " + slideOffset);
+            }
 
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                Log.i(LOG_TAG, "onPanelStateChanged " + newState);
+            }
+        });
+        mSlidingPanelLayout.setFadeOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
 
     }
 
@@ -243,5 +267,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //This Method moves the camera to the position indicated with an animation
     public void flyTo(CameraPosition cameraPosition) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mSlidingPanelLayout != null &&
+                (mSlidingPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED || mSlidingPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
+            mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        } else {
+            super.onBackPressed();
+        }
     }
 }
