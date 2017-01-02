@@ -17,5 +17,7 @@
     <string name="title_activity_maps">Map</string>
     <string name="dropped_pin_text">Dropped Pin</string>
 
+    <string name="max_length_of_panel_title"></string>
+
     <!--End of PujolsLuis Strings-->
 </resources>
