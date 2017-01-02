@@ -1,19 +1,24 @@
 package com.pujolsluis.android.hangeo;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.multidex.MultiDex;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
@@ -72,6 +78,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Planel Layout
     private SlidingUpPanelLayout mSlidingPanelLayout;
+
+    //Dialogs to ADD and DELETE Locations
+    private Dialog addAlertDialog;
+    private Dialog deleteAlertDialog;
 
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
@@ -120,6 +130,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Initialize Sliding Panel
         initializeSlidingPanel();
 
+        final ImageButton addPlaceButton = (ImageButton) findViewById(R.id.add_location_to_plan);
+
+        addPlaceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
+                    addLocationWithDialog();
+                }else if(mLastMarker != null && mSelectedMarkersMap.containsKey(mLastMarker)){
+                    deleteLocationWithDialog();
+                }
+            }
+        });
+
 
     }
 
@@ -140,44 +163,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Setting the correct Padding for the map ui
         mGoogleMap.setPadding(16, 278, 16, 16);
 
-        //On Long Click Listener for map to set temporal marker
-        mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng point) {
-                //Verify if last marker that needs to be removed from map because it was not selected
-                if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
-                    mLastMarker.remove();
-                }
-                Log.d(LOG_TAG, "Hello you did a long click on the map");
-                MarkerOptions tempMarker = new MarkerOptions().position(point).title(getResources().getString(R.string.dropped_pin_text));
-                mLastMarker = mGoogleMap.addMarker(tempMarker);
-//                mLastMarkerslist.add(mLastMarker);
-//                mPolyLinePointList.add(mLastMarker.getPosition());
-//                mPolyLine.setPoints(mPolyLinePointList);
-                // updateCamera();
-            }
-        });
+        //Initializing the Polyline
+        mPolyLine = mGoogleMap.addPolyline(new PolylineOptions());
+        mPolyLine.setColor(Color.BLUE);
 
-        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-//                marker.remove();
-                marker.showInfoWindow();
-                updatePanelHeader(mLastMarker);
-                return true;
-            }
-        });
+        //Set Map Click listeners
+        setmapClickListeners();
 
-        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                if (mSlidingPanelLayout != null && (mSlidingPanelLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN)){
 
-                    mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-
-                }
-            }
-        });
     }
 
     private void setupDrawerContent(final NavigationView navigationView) {
@@ -255,6 +248,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
+    //This method initializes trhe google places fragment
     private void initializeGoogleMapsPlacesFragment(){
         //Set home button OnClickListener for the map Place Fragment
         Button homeMenuButton = (Button) findViewById(R.id.home_menu_map_button);
@@ -275,6 +269,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         autocompleteFragment.setOnPlaceSelectedListener(this);
     }
 
+    //This method initializes the sliding panel for the layout
     private void initializeSlidingPanel(){
 
         //Find Sliding Panel Root Layout element
@@ -301,6 +296,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    //This method updates the panel header text view
     private void updatePanelHeader(Marker marker){
 
         if (mSlidingPanelLayout != null && mSlidingPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN)
@@ -309,6 +305,120 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         panelHeaderTextView.setText(marker.getTitle());
 
+    }
+
+    //This method sets the google maps click listeners
+    private void setmapClickListeners(){
+
+        //On Long Click Listener for map to set temporal marker
+        mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng point) {
+                //Verify if last marker that needs to be removed from map because it was not selected
+                if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
+                    mLastMarker.remove();
+                }
+                Log.d(LOG_TAG, "Hello you did a long click on the map");
+                MarkerOptions tempMarker = new MarkerOptions().position(point).title(getResources().getString(R.string.dropped_pin_text));
+                mLastMarker = mGoogleMap.addMarker(tempMarker);
+//                mLastMarkerslist.add(mLastMarker);
+//                mPolyLinePointList.add(mLastMarker.getPosition());
+//                mPolyLine.setPoints(mPolyLinePointList);
+                // updateCamera();
+            }
+        });
+
+        //On Marker Click Listener
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+//                marker.remove();
+                marker.showInfoWindow();
+                updatePanelHeader(mLastMarker);
+                mLastMarker = marker;
+                return true;
+            }
+        });
+
+        //On Map Click Listener
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (mSlidingPanelLayout != null && (mSlidingPanelLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN)){
+
+                    mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
+                }
+            }
+        });
+    }
+
+    //Adding a location to the map that contains all locations for plan
+    private void addLocationWithDialog(){
+        AlertDialog.Builder builderForAddingLocationDialog = new AlertDialog.Builder(context);
+        builderForAddingLocationDialog.setTitle("Add place?");
+        builderForAddingLocationDialog.setMessage("Are you sure you wish to add this place to your plan?");
+        builderForAddingLocationDialog.setCancelable(true);
+
+        builderForAddingLocationDialog.setPositiveButton(
+                "ADD",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Adding marker to the map that contains all plan locations with its insertion order
+                        mSelectedMarkersMap.put(mLastMarker, mSelectedMarkersMap.size() + 1 );
+                        mSelectedMarkerslist.add(mLastMarker);
+                        mPolyLineSelectedPointList.add(mLastMarker.getPosition());
+                        updatePolylineOfLocations();
+                        dialog.cancel();
+                    }
+                });
+
+        builderForAddingLocationDialog.setNegativeButton(
+                "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        addAlertDialog = builderForAddingLocationDialog.create();
+        addAlertDialog.show();
+    }
+
+    private void deleteLocationWithDialog(){
+        AlertDialog.Builder builderForAddingLocationDialog = new AlertDialog.Builder(context);
+        builderForAddingLocationDialog.setTitle("Delete this place?");
+        builderForAddingLocationDialog.setMessage("Are you sure you wish to delete this place from your plan?");
+        builderForAddingLocationDialog.setCancelable(true);
+
+        builderForAddingLocationDialog.setPositiveButton(
+                "Delete",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Adding marker to the map that contains all plan locations with its insertion order
+                        mSelectedMarkersMap.remove(mLastMarker);
+                        mSelectedMarkerslist.remove(mLastMarker);
+                        mPolyLineSelectedPointList.remove(mLastMarker.getPosition());
+                        mLastMarker.remove();
+                        updatePolylineOfLocations();
+                        dialog.cancel();
+                    }
+                });
+
+        builderForAddingLocationDialog.setNegativeButton(
+                "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        deleteAlertDialog = builderForAddingLocationDialog.create();
+        deleteAlertDialog.show();
+    }
+
+    private void updatePolylineOfLocations(){
+        mPolyLine.setPoints(mPolyLineSelectedPointList);
     }
 
     @Override
