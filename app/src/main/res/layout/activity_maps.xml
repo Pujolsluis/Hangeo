@@ -116,7 +116,7 @@
                             android:paddingRight="16dp"
                             android:layout_marginRight="80dp"/>
                         <ImageButton
-                            android:id="@+id/add_destiny_to_plan"
+                            android:id="@+id/add_location_to_plan"
                             android:src="@drawable/ic_add_location_black"
                             android:scaleType="centerCrop"
                             android:background="?android:attr/selectableItemBackground"
@@ -126,7 +126,8 @@
                             android:layout_alignParentEnd="true"
                             android:layout_alignParentTop="true"
                             android:padding="16dp"
-                            android:gravity="center_vertical"/>
+                            android:gravity="center_vertical"
+                            android:clickable="true"/>
                     </RelativeLayout>
                 </LinearLayout>
                 <!--END OF SLIDING UP PANEL LAYOUT-->
