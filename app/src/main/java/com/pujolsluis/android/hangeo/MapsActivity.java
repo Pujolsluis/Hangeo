@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener {
 
@@ -64,8 +66,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private Marker mLastPlaceMarker;
 
-    private ArrayList<Marker> mLastMarkerslist = new ArrayList<>();
-    private ArrayList<LatLng> mPolyLinePointList = new ArrayList<>();
+    private HashMap<Marker, Integer> mSelectedMarkersMap = new HashMap<>();
+    private ArrayList<Marker> mSelectedMarkerslist = new ArrayList<>();
+    private ArrayList<LatLng> mPolyLineSelectedPointList = new ArrayList<>();
 
     //Planel Layout
     private SlidingUpPanelLayout mSlidingPanelLayout;
@@ -82,16 +85,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-/*  Old Toolbar for the layout [SOON TO BE REMOVED]
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        final ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-            ab.setDisplayHomeAsUpEnabled(true);
-        }
-*/
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_map);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_map);
@@ -112,23 +105,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Get Map Activity Layout
         mLayout = findViewById(R.id.map_main_content);
 
-        //Set home button OnClickListener for the map Place Fragment
-        Button homeMenuButton = (Button) findViewById(R.id.home_menu_map_button);
-        homeMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mDrawerLayout.openDrawer(GravityCompat.START);
 
-            }
-        });
-
-        // Retrieve the PlaceAutocompleteFragment.
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-
-        // Register a listener to receive callbacks when a place has been selected or an error has
-        // occurred.
-        autocompleteFragment.setOnPlaceSelectedListener(this);
+        //Initialize Google Places Search Box Fragment
+        initializeGoogleMapsPlacesFragment();
 
         //Initialize USER_LOCATION
         mLastLocationLatLng = new LatLng(18.6976745, -71.2865409);
@@ -138,27 +117,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .bearing(0)
                 .build();
 
-        //Find Sliding Panel Root Layout element
-        mSlidingPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        //Setting Panel with a anchor point in the middle of screen
-        mSlidingPanelLayout.setAnchorPoint(0.7f);
-        mSlidingPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-                Log.i(LOG_TAG, "onPanelSlide, offset " + slideOffset);
-            }
+        //Initialize Sliding Panel
+        initializeSlidingPanel();
 
-            @Override
-            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-                Log.i(LOG_TAG, "onPanelStateChanged " + newState);
-            }
-        });
-        mSlidingPanelLayout.setFadeOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            }
-        });
 
     }
 
@@ -170,9 +131,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Add a marker in Sydney and move the camera
         LatLng sevendips = new LatLng(18.487438, -69.961872);
-        mGoogleMap.addMarker(new MarkerOptions().position(sevendips).title("Marker in sevendips"));
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(sevendips));
-        mGoogleMap.setMinZoomPreference((float)16.5);
+        CameraPosition cameraStartPosition = CameraPosition.builder()
+                .target(sevendips)
+                .zoom(15)
+                .bearing(0)
+                .build();
+        flyTo(cameraStartPosition);
         //Setting the correct Padding for the map ui
         mGoogleMap.setPadding(16, 278, 16, 16);
 
@@ -180,8 +144,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng point) {
-                //mGoogleMap.clear();
-                Log.d(LOG_TAG, "Hello you clicked me!");
+                //Verify if last marker that needs to be removed from map because it was not selected
+                if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
+                    mLastMarker.remove();
+                }
+                Log.d(LOG_TAG, "Hello you did a long click on the map");
                 MarkerOptions tempMarker = new MarkerOptions().position(point).title(getResources().getString(R.string.dropped_pin_text));
                 mLastMarker = mGoogleMap.addMarker(tempMarker);
 //                mLastMarkerslist.add(mLastMarker);
@@ -196,7 +163,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onMarkerClick(Marker marker) {
 //                marker.remove();
                 marker.showInfoWindow();
+                updatePanelHeader(mLastMarker);
                 return true;
+            }
+        });
+
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (mSlidingPanelLayout != null && (mSlidingPanelLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN)){
+
+                    mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
+                }
             }
         });
     }
@@ -240,13 +219,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Method that gets called when a place is selected from the search box
     @Override
     public void onPlaceSelected(Place place) {
+
+        //Verify if last marker that needs to be removed from map because it was not selected
+        if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
+            mLastMarker.remove();
+        }
+
         LatLng target = place.getLatLng();
         MarkerOptions selectedPlaceMarker = new MarkerOptions()
                 .position(target)
-                .title(place.getName().toString() + " " + place.getPriceLevel());
+                .title(place.getName().toString());
         Marker placeMarker = mGoogleMap.addMarker(selectedPlaceMarker);
-        mLastMarkerslist.add(placeMarker);
-        mLastPlaceMarker = placeMarker;
+       // mSelectedMarkerslist.add(placeMarker);
+        mLastMarker = placeMarker;
 //        mPolyLinePointList.add(placeMarker.getPosition());
 //        mPolyLine.setPoints(mPolyLinePointList);
         CameraPosition newPosition = CameraPosition.builder()
@@ -255,6 +240,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .bearing(0)
                 .build();
         flyTo(newPosition);
+        updatePanelHeader(mLastMarker);
 
     }
 
@@ -267,6 +253,62 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //This Method moves the camera to the position indicated with an animation
     public void flyTo(CameraPosition cameraPosition) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private void initializeGoogleMapsPlacesFragment(){
+        //Set home button OnClickListener for the map Place Fragment
+        Button homeMenuButton = (Button) findViewById(R.id.home_menu_map_button);
+        homeMenuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawerLayout.openDrawer(GravityCompat.START);
+
+            }
+        });
+
+        // Retrieve the PlaceAutocompleteFragment.
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Register a listener to receive callbacks when a place has been selected or an error has
+        // occurred.
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+    }
+
+    private void initializeSlidingPanel(){
+
+        //Find Sliding Panel Root Layout element
+        mSlidingPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        //Setting Panel with a anchor point in the middle of screen
+        mSlidingPanelLayout.setAnchorPoint(0.7f);
+        mSlidingPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                Log.i(LOG_TAG, "onPanelSlide, offset " + slideOffset);
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                Log.i(LOG_TAG, "onPanelStateChanged " + newState);
+            }
+        });
+        mSlidingPanelLayout.setFadeOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
+
+    }
+
+    private void updatePanelHeader(Marker marker){
+
+        if (mSlidingPanelLayout != null && mSlidingPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN)
+            mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        TextView panelHeaderTextView = (TextView) findViewById(R.id.panelHeader_TextView_dragView);
+
+        panelHeaderTextView.setText(marker.getTitle());
+
     }
 
     @Override
