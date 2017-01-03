@@ -14,7 +14,7 @@
             android:id="@+id/user2"
             android:layout_width="384dp"
             android:layout_height="match_parent"
-            android:src="@drawable/User2" />
+            android:src="@drawable/user2" />
 
 
     </LinearLayout>
@@ -111,7 +111,7 @@
                 android:background="#FFFFFF"
                 android:paddingLeft="40dp"
                 android:paddingRight="20dp"
-                android:src="@drawable/Phone" />
+                android:src="@drawable/phone" />
 
             <TextView
                 android:id="@+id/call"
@@ -140,7 +140,7 @@
                 android:background="#FFFFFF"
                 android:paddingLeft="35dp"
                 android:paddingRight="24dp"
-                android:src="@drawable/New_Message" />
+                android:src="@drawable/new_message" />
 
             <TextView
                 android:id="@+id/message"

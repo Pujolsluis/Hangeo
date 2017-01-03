@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:baselineAlignBottom="@+id/textView"
-            android:src="@drawable/Cancel" />
+            android:src="@drawable/cancel" />
 
 
         <TextView
@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="9"
-            android:src="@drawable/User"
+            android:src="@drawable/user"
             android:background="#3366CC"/>
 
         <TextView
