@@ -230,6 +230,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
         flyTo(newPosition);
         updatePanelHeader(mLastMarker);
+        updatePanelHeaderButton(mLastMarker);
 
     }
 
@@ -348,6 +349,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                marker.remove();
                 marker.showInfoWindow();
                 updatePanelHeader(mLastMarker);
+                updatePanelHeaderButton(marker);
                 mLastMarker = marker;
                 return true;
             }
@@ -427,8 +429,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         //Updating Map Polyline
                         updatePolylineOfLocations();
 
-                        mPanelButton.setImageResource(R.drawable.ic_add_location_black);
-                        mPanelButton.setColorFilter(Color.argb(255,100,181,246));
                         mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                         //Updating Map Bounds
                         if(!mPolyLineSelectedPointList.isEmpty())
@@ -467,6 +467,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Update Camera to new Bounds
         mGoogleMap.moveCamera(newMapBounds);
+    }
+
+    private void updatePanelHeaderButton(Marker marker){
+        if(mSelectedMarkersMap.containsKey(marker)){
+            mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+            mPanelButton.setColorFilter(Color.RED);
+        }else {
+            mPanelButton.setImageResource(R.drawable.ic_add_location_black);
+            mPanelButton.setColorFilter(Color.argb(255, 100, 181, 246));
+        }
     }
 
     @Override
