@@ -429,6 +429,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         mPanelButton.setImageResource(R.drawable.ic_add_location_black);
                         mPanelButton.setColorFilter(Color.argb(255,100,181,246));
+                        mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                         //Updating Map Bounds
                         if(!mPolyLineSelectedPointList.isEmpty())
                             updateMapBounds();
