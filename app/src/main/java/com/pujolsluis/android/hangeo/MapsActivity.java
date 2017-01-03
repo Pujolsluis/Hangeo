@@ -87,6 +87,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Dialog addAlertDialog;
     private Dialog deleteAlertDialog;
 
+    //Panel Header Button
+    private ImageButton mPanelButton;
+
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -134,6 +137,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Initialize Sliding Panel
         initializeSlidingPanel();
 
+        mPanelButton = (ImageButton) findViewById(R.id.add_location_to_plan);
 
 
     }
@@ -384,6 +388,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         //Updating Bounds Builder for Map
                         updateMapBounds();
 
+                        mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+                        mPanelButton.setColorFilter(Color.RED);
+
                         //Close Alert Dialog
                         dialog.cancel();
                     }
@@ -420,8 +427,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         //Updating Map Polyline
                         updatePolylineOfLocations();
 
+                        mPanelButton.setImageResource(R.drawable.ic_add_location_black);
+                        mPanelButton.setColorFilter(Color.argb(255,100,181,246));
                         //Updating Map Bounds
-                        updateMapBounds();
+                        if(!mPolyLineSelectedPointList.isEmpty())
+                            updateMapBounds();
                         dialog.cancel();
                     }
                 });
