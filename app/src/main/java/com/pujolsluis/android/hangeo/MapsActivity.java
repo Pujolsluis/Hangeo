@@ -321,6 +321,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    //Updating the Panel Header button
+    private void updatePanelHeaderButton(Marker marker){
+        if(mSelectedMarkersMap.containsKey(marker)){
+            mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+            mPanelButton.setColorFilter(Color.RED);
+        }else {
+            mPanelButton.setImageResource(R.drawable.ic_add_location_black);
+            mPanelButton.setColorFilter(Color.argb(255, 100, 181, 246));
+        }
+    }
+
     //This method sets the google maps click listeners
     private void setmapClickListeners(){
 
@@ -368,7 +379,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    //Adding a location to the map that contains all locations for plan
+    //Adding a location to the map that contains all locations for the plan
     private void addLocationWithDialog(){
         AlertDialog.Builder builderForAddingLocationDialog = new AlertDialog.Builder(context);
         builderForAddingLocationDialog.setTitle("Add place?");
@@ -410,6 +421,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         addAlertDialog.show();
     }
 
+    //Deleting a location from the map that contains all locations for the plan
     private void deleteLocationWithDialog(){
         AlertDialog.Builder builderForAddingLocationDialog = new AlertDialog.Builder(context);
         builderForAddingLocationDialog.setTitle("Delete this place?");
@@ -449,10 +461,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         deleteAlertDialog.show();
     }
 
+    //Update the polyline between locations
     private void updatePolylineOfLocations(){
         mPolyLine.setPoints(mPolyLineSelectedPointList);
     }
 
+    //Updating the map bounds to move camera so it includes all new locations in the map camera
     private void updateMapBounds(){
         LatLngBounds.Builder mMapLatLngBoundsBuilder = new LatLngBounds.Builder();
 
@@ -469,16 +483,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.moveCamera(newMapBounds);
     }
 
-    private void updatePanelHeaderButton(Marker marker){
-        if(mSelectedMarkersMap.containsKey(marker)){
-            mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
-            mPanelButton.setColorFilter(Color.RED);
-        }else {
-            mPanelButton.setImageResource(R.drawable.ic_add_location_black);
-            mPanelButton.setColorFilter(Color.argb(255, 100, 181, 246));
-        }
-    }
-
+    //Verifying everything is closed in the UI to confirm that the back click was to exit the application
     @Override
     public void onBackPressed() {
         if (mSlidingPanelLayout != null &&
