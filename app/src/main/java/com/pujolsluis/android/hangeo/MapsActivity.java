@@ -1,45 +1,64 @@
 package com.pujolsluis.android.hangeo;
 
+import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.multidex.MultiDex;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener {
+import static com.pujolsluis.android.hangeo.R.id.map;
 
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
+        ActivityCompat.OnRequestPermissionsResultCallback {
+
+    static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
     private DrawerLayout mDrawerLayout;
     Context context = this;
 
-    //Identifier for the Location Request
-    private static final int REQUEST_LOCATION = 0;
+
     // Google Map Object
     private GoogleMap mGoogleMap;
     //Map Ready Indicator
@@ -62,8 +81,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private Marker mLastPlaceMarker;
 
-    private ArrayList<Marker> mLastMarkerslist = new ArrayList<>();
-    private ArrayList<LatLng> mPolyLinePointList = new ArrayList<>();
+    private HashMap<Marker, Integer> mSelectedMarkersMap = new HashMap<>();
+    private ArrayList<Marker> mSelectedMarkerslist = new ArrayList<>();
+    private ArrayList<LatLng> mPolyLineSelectedPointList = new ArrayList<>();
+
+    //Planel Layout
+    private SlidingUpPanelLayout mSlidingPanelLayout;
+
+    //Dialogs to ADD and DELETE Locations
+    private Dialog addAlertDialog;
+    private Dialog deleteAlertDialog;
+
+    //Panel Header Button
+    private ImageButton mPanelButton;
+
+    //Request Location Identifier
+    private static final int REQUEST_LOCATION = 0;
 
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
@@ -77,16 +110,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-/*  Old Toolbar for the layout [SOON TO BE REMOVED]
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        final ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-            ab.setDisplayHomeAsUpEnabled(true);
-        }
-*/
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_map);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_map);
@@ -101,29 +124,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
         //Get Map Activity Layout
         mLayout = findViewById(R.id.map_main_content);
 
-        //Set home button OnClickListener for the map Place Fragment
-        Button homeMenuButton = (Button) findViewById(R.id.home_menu_map_button);
-        homeMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mDrawerLayout.openDrawer(GravityCompat.START);
 
-            }
-        });
-
-        // Retrieve the PlaceAutocompleteFragment.
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-
-        // Register a listener to receive callbacks when a place has been selected or an error has
-        // occurred.
-        autocompleteFragment.setOnPlaceSelectedListener(this);
+        //Initialize Google Places Search Box Fragment
+        initializeGoogleMapsPlacesFragment();
 
         //Initialize USER_LOCATION
         mLastLocationLatLng = new LatLng(18.6976745, -71.2865409);
@@ -133,6 +142,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .bearing(0)
                 .build();
 
+        //Initialize Sliding Panel
+        initializeSlidingPanel();
+
+        mPanelButton = (ImageButton) findViewById(R.id.add_location_to_plan);
 
 
     }
@@ -145,11 +158,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Add a marker in Sydney and move the camera
         LatLng sevendips = new LatLng(18.487438, -69.961872);
-        mGoogleMap.addMarker(new MarkerOptions().position(sevendips).title("Marker in sevendips"));
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(sevendips));
-        mGoogleMap.setMinZoomPreference((float)16.5);
+        CameraPosition cameraStartPosition = CameraPosition.builder()
+                .target(sevendips)
+                .zoom(15)
+                .bearing(0)
+                .build();
+        flyTo(cameraStartPosition);
         //Setting the correct Padding for the map ui
         mGoogleMap.setPadding(16, 278, 16, 16);
+
+        //Initializing the Polyline
+        mPolyLine = mGoogleMap.addPolyline(new PolylineOptions());
+        mPolyLine.setColor(Color.BLUE);
+
+        //Set Map Click listeners
+        setmapClickListeners();
+
+
+        //Verifying and Asking for the users device location, to initialize the MyLocations Google Maps Ui Tool
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            mGoogleMap.setMyLocationEnabled(true);
+        } else requestLocationPermission();
+
+
     }
 
     private void setupDrawerContent(final NavigationView navigationView) {
@@ -157,7 +188,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        switch (menuItem.getItemId()){
+                        switch (menuItem.getItemId()) {
                             case R.id.nav_plans:
                                 Intent intent = new Intent(context, MainActivity.class);
                                 mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -191,13 +222,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Method that gets called when a place is selected from the search box
     @Override
     public void onPlaceSelected(Place place) {
+
+        //Verify if last marker that needs to be removed from map because it was not selected
+        if (mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)) {
+            mLastMarker.remove();
+        }
+
         LatLng target = place.getLatLng();
         MarkerOptions selectedPlaceMarker = new MarkerOptions()
                 .position(target)
-                .title(place.getName().toString() + " " + place.getPriceLevel());
+                .title(place.getName().toString());
         Marker placeMarker = mGoogleMap.addMarker(selectedPlaceMarker);
-        mLastMarkerslist.add(placeMarker);
-        mLastPlaceMarker = placeMarker;
+        // mSelectedMarkerslist.add(placeMarker);
+        mLastMarker = placeMarker;
 //        mPolyLinePointList.add(placeMarker.getPosition());
 //        mPolyLine.setPoints(mPolyLinePointList);
         CameraPosition newPosition = CameraPosition.builder()
@@ -206,6 +243,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .bearing(0)
                 .build();
         flyTo(newPosition);
+        updatePanelHeader(mLastMarker);
+        updatePanelHeaderButton(mLastMarker);
 
     }
 
@@ -219,4 +258,316 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void flyTo(CameraPosition cameraPosition) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
+
+    //This method initializes trhe google places fragment
+    private void initializeGoogleMapsPlacesFragment() {
+        //Set home button OnClickListener for the map Place Fragment
+        Button homeMenuButton = (Button) findViewById(R.id.home_menu_map_button);
+        homeMenuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawerLayout.openDrawer(GravityCompat.START);
+
+            }
+        });
+
+        // Retrieve the PlaceAutocompleteFragment.
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Register a listener to receive callbacks when a place has been selected or an error has
+        // occurred.
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+    }
+
+    //This method initializes the sliding panel for the layout
+    private void initializeSlidingPanel() {
+
+        //addPlaceButton of Panel initialization
+        final ImageButton addPlaceButton = (ImageButton) findViewById(R.id.add_location_to_plan);
+
+        addPlaceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)) {
+                    addLocationWithDialog();
+                } else if (mLastMarker != null && mSelectedMarkersMap.containsKey(mLastMarker)) {
+                    deleteLocationWithDialog();
+                }
+            }
+        });
+
+        //Find Sliding Panel Root Layout element
+        mSlidingPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        //Setting Panel with a anchor point in the middle of screen
+        mSlidingPanelLayout.setAnchorPoint(0.7f);
+        mSlidingPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                Log.i(LOG_TAG, "onPanelSlide, offset " + slideOffset);
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                Log.i(LOG_TAG, "onPanelStateChanged " + newState);
+            }
+        });
+        mSlidingPanelLayout.setFadeOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
+
+        //Setting the panel to be initially hidden
+        mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
+    }
+
+    //This method updates the panel header text view
+    private void updatePanelHeader(Marker marker) {
+
+        if (mSlidingPanelLayout != null && mSlidingPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN)
+            mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        TextView panelHeaderTextView = (TextView) findViewById(R.id.panelHeader_TextView_dragView);
+
+        panelHeaderTextView.setText(marker.getTitle());
+
+    }
+
+    //Updating the Panel Header button
+    private void updatePanelHeaderButton(Marker marker) {
+        if (mSelectedMarkersMap.containsKey(marker)) {
+            mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+            mPanelButton.setColorFilter(Color.RED);
+        } else {
+            mPanelButton.setImageResource(R.drawable.ic_add_location_black);
+            mPanelButton.setColorFilter(Color.argb(255, 100, 181, 246));
+        }
+    }
+
+    //This method sets the google maps click listeners
+    private void setmapClickListeners() {
+
+        //On Long Click Listener for map to set temporal marker
+        mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng point) {
+                //Verify if last marker that needs to be removed from map because it was not selected
+                if (mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)) {
+                    mLastMarker.remove();
+                }
+                Log.d(LOG_TAG, "Hello you did a long click on the map");
+                MarkerOptions tempMarker = new MarkerOptions().position(point).title(getResources().getString(R.string.dropped_pin_text));
+                mLastMarker = mGoogleMap.addMarker(tempMarker);
+//                mLastMarkerslist.add(mLastMarker);
+//                mPolyLinePointList.add(mLastMarker.getPosition());
+//                mPolyLine.setPoints(mPolyLinePointList);
+                // updateCamera();
+            }
+        });
+
+        //On Marker Click Listener
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+//                marker.remove();
+                marker.showInfoWindow();
+                updatePanelHeader(mLastMarker);
+                updatePanelHeaderButton(marker);
+                mLastMarker = marker;
+                return true;
+            }
+        });
+
+        //On Map Click Listener
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (mSlidingPanelLayout != null && (mSlidingPanelLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN)) {
+
+                    mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
+                }
+            }
+        });
+    }
+
+    //Adding a location to the map that contains all locations for the plan
+    private void addLocationWithDialog() {
+        AlertDialog.Builder builderForAddingLocationDialog = new AlertDialog.Builder(context);
+        builderForAddingLocationDialog.setTitle("Add place?");
+        builderForAddingLocationDialog.setMessage("Are you sure you wish to add this place to your plan?");
+        builderForAddingLocationDialog.setCancelable(true);
+
+        builderForAddingLocationDialog.setPositiveButton(
+                "ADD",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Adding marker to the map that contains all plan locations with its insertion order
+                        mSelectedMarkersMap.put(mLastMarker, mSelectedMarkersMap.size() + 1);
+                        mSelectedMarkerslist.add(mLastMarker);
+                        mPolyLineSelectedPointList.add(mLastMarker.getPosition());
+
+                        //Updating Map Polyline
+                        updatePolylineOfLocations();
+
+                        //Updating Bounds Builder for Map
+                        updateMapBounds();
+
+                        mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+                        mPanelButton.setColorFilter(Color.RED);
+
+                        //Close Alert Dialog
+                        dialog.cancel();
+                    }
+                });
+
+        builderForAddingLocationDialog.setNegativeButton(
+                "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        addAlertDialog = builderForAddingLocationDialog.create();
+        addAlertDialog.show();
+    }
+
+    //Deleting a location from the map that contains all locations for the plan
+    private void deleteLocationWithDialog() {
+        AlertDialog.Builder builderForAddingLocationDialog = new AlertDialog.Builder(context);
+        builderForAddingLocationDialog.setTitle("Delete this place?");
+        builderForAddingLocationDialog.setMessage("Are you sure you wish to delete this place from your plan?");
+        builderForAddingLocationDialog.setCancelable(true);
+
+        builderForAddingLocationDialog.setPositiveButton(
+                "Delete",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Removing marker from list of locations in plan
+                        mSelectedMarkersMap.remove(mLastMarker);
+                        mSelectedMarkerslist.remove(mLastMarker);
+                        mPolyLineSelectedPointList.remove(mLastMarker.getPosition());
+                        mLastMarker.remove();
+
+                        //Updating Map Polyline
+                        updatePolylineOfLocations();
+
+                        mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+                        //Updating Map Bounds
+                        if (!mPolyLineSelectedPointList.isEmpty())
+                            updateMapBounds();
+                        dialog.cancel();
+                    }
+                });
+
+        builderForAddingLocationDialog.setNegativeButton(
+                "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        deleteAlertDialog = builderForAddingLocationDialog.create();
+        deleteAlertDialog.show();
+    }
+
+    //Update the polyline between locations
+    private void updatePolylineOfLocations() {
+        mPolyLine.setPoints(mPolyLineSelectedPointList);
+    }
+
+    //Updating the map bounds to move camera so it includes all new locations in the map camera
+    private void updateMapBounds() {
+        LatLngBounds.Builder mMapLatLngBoundsBuilder = new LatLngBounds.Builder();
+
+        //Include points to consider for map Bounds
+        for (int i = 0; i < mPolyLineSelectedPointList.size(); i++) {
+            mMapLatLngBoundsBuilder.include(mPolyLineSelectedPointList.get(i));
+        }
+
+        //Create new Camera Update to indicate where to move camera
+        CameraUpdate newMapBounds =
+                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 48);
+
+        //Update Camera to new Bounds
+        mGoogleMap.moveCamera(newMapBounds);
+    }
+
+    //Verifying everything is closed in the UI to confirm that the back click was to exit the application
+    @Override
+    public void onBackPressed() {
+        if (mSlidingPanelLayout != null &&
+                (mSlidingPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED || mSlidingPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
+            mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void requestLocationPermission() {
+        Log.i(LOG_TAG, "Location permission has NOT been granted. Requesting permission.");
+
+        // BEGIN_INCLUDE(camera_permission_request)
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            Log.i(LOG_TAG,
+                    "Displaying location permission rationale to provide additional context.");
+            Snackbar.make(mLayout, R.string.permission_location_rationale,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(MapsActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    REQUEST_LOCATION);
+                        }
+                    })
+                    .show();
+        } else {
+
+            // Camera permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    REQUEST_LOCATION);
+        }
+        // END_INCLUDE(camera_permission_request)
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == REQUEST_LOCATION) {
+            // BEGIN_INCLUDE(permission_result)
+            // Received permission result for camera permission.
+            Log.i(LOG_TAG, "Received response for Location permission request.");
+
+            // Check if the only required permission has been granted
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Camera permission has been granted, preview can be displayed
+                Log.i(LOG_TAG, "Location permission has now been granted. Showing preview.");
+//                Snackbar.make(mLayout, R.string.permision_available_camera,
+//                        Snackbar.LENGTH_SHORT).show();
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    mGoogleMap.setMyLocationEnabled(true);
+                }
+            } else {
+                Log.i(LOG_TAG, "Location permission was NOT granted.");
+                Snackbar.make(mLayout, R.string.permissions_not_granted,
+                        Snackbar.LENGTH_SHORT).show();
+
+            }
+            // END_INCLUDE(permission_result)
+
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
 }
