@@ -17,7 +17,9 @@
     <string name="title_activity_maps">Map</string>
     <string name="dropped_pin_text">Dropped Pin</string>
 
-    <string name="max_length_of_panel_title"></string>
-
+    <string name="ok">OK</string>
+    <string name="permision_available_location">LOCATION Permission has been granted. You can now use the my locations tool.</string>
+    <string name="permission_location_rationale">LOCATION Permission is needed to show the my locations tool.</string>
+    <string name="permissions_not_granted">Permissions were not granted.</string>
     <!--End of PujolsLuis Strings-->
 </resources>

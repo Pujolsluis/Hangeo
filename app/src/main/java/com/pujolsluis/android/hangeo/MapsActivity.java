@@ -1,15 +1,20 @@
 package com.pujolsluis.android.hangeo;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.multidex.MultiDex;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -45,15 +50,15 @@ import java.util.HashMap;
 
 import static com.pujolsluis.android.hangeo.R.id.map;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
+        ActivityCompat.OnRequestPermissionsResultCallback {
 
     static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
     private DrawerLayout mDrawerLayout;
     Context context = this;
 
-    //Identifier for the Location Request
-    private static final int REQUEST_LOCATION = 0;
+
     // Google Map Object
     private GoogleMap mGoogleMap;
     //Map Ready Indicator
@@ -89,6 +94,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Panel Header Button
     private ImageButton mPanelButton;
+
+    //Request Location Identifier
+    private static final int REQUEST_LOCATION = 0;
 
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
@@ -167,6 +175,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setmapClickListeners();
 
 
+        //Verifying and Asking for the users device location, to initialize the MyLocations Google Maps Ui Tool
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            mGoogleMap.setMyLocationEnabled(true);
+        } else requestLocationPermission();
+
+
     }
 
     private void setupDrawerContent(final NavigationView navigationView) {
@@ -174,7 +188,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        switch (menuItem.getItemId()){
+                        switch (menuItem.getItemId()) {
                             case R.id.nav_plans:
                                 Intent intent = new Intent(context, MainActivity.class);
                                 mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -210,7 +224,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onPlaceSelected(Place place) {
 
         //Verify if last marker that needs to be removed from map because it was not selected
-        if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
+        if (mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)) {
             mLastMarker.remove();
         }
 
@@ -219,7 +233,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .position(target)
                 .title(place.getName().toString());
         Marker placeMarker = mGoogleMap.addMarker(selectedPlaceMarker);
-       // mSelectedMarkerslist.add(placeMarker);
+        // mSelectedMarkerslist.add(placeMarker);
         mLastMarker = placeMarker;
 //        mPolyLinePointList.add(placeMarker.getPosition());
 //        mPolyLine.setPoints(mPolyLinePointList);
@@ -246,7 +260,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //This method initializes trhe google places fragment
-    private void initializeGoogleMapsPlacesFragment(){
+    private void initializeGoogleMapsPlacesFragment() {
         //Set home button OnClickListener for the map Place Fragment
         Button homeMenuButton = (Button) findViewById(R.id.home_menu_map_button);
         homeMenuButton.setOnClickListener(new View.OnClickListener() {
@@ -267,7 +281,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //This method initializes the sliding panel for the layout
-    private void initializeSlidingPanel(){
+    private void initializeSlidingPanel() {
 
         //addPlaceButton of Panel initialization
         final ImageButton addPlaceButton = (ImageButton) findViewById(R.id.add_location_to_plan);
@@ -275,9 +289,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         addPlaceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
+                if (mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)) {
                     addLocationWithDialog();
-                }else if(mLastMarker != null && mSelectedMarkersMap.containsKey(mLastMarker)){
+                } else if (mLastMarker != null && mSelectedMarkersMap.containsKey(mLastMarker)) {
                     deleteLocationWithDialog();
                 }
             }
@@ -311,7 +325,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //This method updates the panel header text view
-    private void updatePanelHeader(Marker marker){
+    private void updatePanelHeader(Marker marker) {
 
         if (mSlidingPanelLayout != null && mSlidingPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN)
             mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -322,25 +336,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Updating the Panel Header button
-    private void updatePanelHeaderButton(Marker marker){
-        if(mSelectedMarkersMap.containsKey(marker)){
+    private void updatePanelHeaderButton(Marker marker) {
+        if (mSelectedMarkersMap.containsKey(marker)) {
             mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
             mPanelButton.setColorFilter(Color.RED);
-        }else {
+        } else {
             mPanelButton.setImageResource(R.drawable.ic_add_location_black);
             mPanelButton.setColorFilter(Color.argb(255, 100, 181, 246));
         }
     }
 
     //This method sets the google maps click listeners
-    private void setmapClickListeners(){
+    private void setmapClickListeners() {
 
         //On Long Click Listener for map to set temporal marker
         mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng point) {
                 //Verify if last marker that needs to be removed from map because it was not selected
-                if(mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)){
+                if (mLastMarker != null && !mSelectedMarkersMap.containsKey(mLastMarker)) {
                     mLastMarker.remove();
                 }
                 Log.d(LOG_TAG, "Hello you did a long click on the map");
@@ -370,7 +384,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if (mSlidingPanelLayout != null && (mSlidingPanelLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN)){
+                if (mSlidingPanelLayout != null && (mSlidingPanelLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN)) {
 
                     mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
@@ -380,7 +394,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Adding a location to the map that contains all locations for the plan
-    private void addLocationWithDialog(){
+    private void addLocationWithDialog() {
         AlertDialog.Builder builderForAddingLocationDialog = new AlertDialog.Builder(context);
         builderForAddingLocationDialog.setTitle("Add place?");
         builderForAddingLocationDialog.setMessage("Are you sure you wish to add this place to your plan?");
@@ -391,7 +405,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Adding marker to the map that contains all plan locations with its insertion order
-                        mSelectedMarkersMap.put(mLastMarker, mSelectedMarkersMap.size() + 1 );
+                        mSelectedMarkersMap.put(mLastMarker, mSelectedMarkersMap.size() + 1);
                         mSelectedMarkerslist.add(mLastMarker);
                         mPolyLineSelectedPointList.add(mLastMarker.getPosition());
 
@@ -422,7 +436,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Deleting a location from the map that contains all locations for the plan
-    private void deleteLocationWithDialog(){
+    private void deleteLocationWithDialog() {
         AlertDialog.Builder builderForAddingLocationDialog = new AlertDialog.Builder(context);
         builderForAddingLocationDialog.setTitle("Delete this place?");
         builderForAddingLocationDialog.setMessage("Are you sure you wish to delete this place from your plan?");
@@ -443,7 +457,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                         //Updating Map Bounds
-                        if(!mPolyLineSelectedPointList.isEmpty())
+                        if (!mPolyLineSelectedPointList.isEmpty())
                             updateMapBounds();
                         dialog.cancel();
                     }
@@ -462,21 +476,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Update the polyline between locations
-    private void updatePolylineOfLocations(){
+    private void updatePolylineOfLocations() {
         mPolyLine.setPoints(mPolyLineSelectedPointList);
     }
 
     //Updating the map bounds to move camera so it includes all new locations in the map camera
-    private void updateMapBounds(){
+    private void updateMapBounds() {
         LatLngBounds.Builder mMapLatLngBoundsBuilder = new LatLngBounds.Builder();
 
         //Include points to consider for map Bounds
-        for(int i=0; i<mPolyLineSelectedPointList.size(); i++){
+        for (int i = 0; i < mPolyLineSelectedPointList.size(); i++) {
             mMapLatLngBoundsBuilder.include(mPolyLineSelectedPointList.get(i));
         }
 
         //Create new Camera Update to indicate where to move camera
-        CameraUpdate newMapBounds=
+        CameraUpdate newMapBounds =
                 CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 48);
 
         //Update Camera to new Bounds
@@ -493,4 +507,67 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             super.onBackPressed();
         }
     }
+
+    private void requestLocationPermission() {
+        Log.i(LOG_TAG, "Location permission has NOT been granted. Requesting permission.");
+
+        // BEGIN_INCLUDE(camera_permission_request)
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            Log.i(LOG_TAG,
+                    "Displaying location permission rationale to provide additional context.");
+            Snackbar.make(mLayout, R.string.permission_location_rationale,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(MapsActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    REQUEST_LOCATION);
+                        }
+                    })
+                    .show();
+        } else {
+
+            // Camera permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    REQUEST_LOCATION);
+        }
+        // END_INCLUDE(camera_permission_request)
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == REQUEST_LOCATION) {
+            // BEGIN_INCLUDE(permission_result)
+            // Received permission result for camera permission.
+            Log.i(LOG_TAG, "Received response for Location permission request.");
+
+            // Check if the only required permission has been granted
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Camera permission has been granted, preview can be displayed
+                Log.i(LOG_TAG, "Location permission has now been granted. Showing preview.");
+//                Snackbar.make(mLayout, R.string.permision_available_camera,
+//                        Snackbar.LENGTH_SHORT).show();
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    mGoogleMap.setMyLocationEnabled(true);
+                }
+            } else {
+                Log.i(LOG_TAG, "Location permission was NOT granted.");
+                Snackbar.make(mLayout, R.string.permissions_not_granted,
+                        Snackbar.LENGTH_SHORT).show();
+
+            }
+            // END_INCLUDE(permission_result)
+
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
 }
