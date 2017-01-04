@@ -26,8 +26,10 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -51,7 +53,7 @@ import java.util.HashMap;
 import static com.pujolsluis.android.hangeo.R.id.map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
@@ -73,7 +75,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location mLastLocation;
     private LatLng mLastLocationLatLng;
     //FirstOnStart
-    private Boolean FirstonStart = true;
+    private Boolean mFirstOnStart = true;
     //Last Marker on long click
     private Marker mLastMarker;
     //PolyLine Between created markers
@@ -147,6 +149,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mPanelButton = (ImageButton) findViewById(R.id.add_location_to_plan);
 
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
 
     }
 
@@ -176,7 +186,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         //Verifying and Asking for the users device location, to initialize the MyLocations Google Maps Ui Tool
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mGoogleMap.setMyLocationEnabled(true);
         } else requestLocationPermission();
 
@@ -251,6 +261,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Method that gets called when an error occurs with a place selected from the search box
     @Override
     public void onError(Status status) {
+        Log.e(LOG_TAG, "There has been an error retrieving the place Status: " + status.getStatusMessage());
         return;
     }
 
@@ -570,4 +581,56 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //On Connected to the Google Api
+    @Override
+    public void onConnected(Bundle connectionHint) {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            //Moving Map Camara to user position if its the first time he opens the app
+            if(mFirstOnStart) {
+                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                        mGoogleApiClient);
+                if (mLastLocation != null) {
+                    CameraPosition cameraStartPosition = CameraPosition.builder()
+                            .target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
+                            .zoom(15)
+                            .bearing(0)
+                            .build();
+                    flyTo(cameraStartPosition);
+                }
+                mFirstOnStart = false;
+            }else return;
+
+        } else requestLocationPermission();
+
+
+    }
+
+    //On Connection Suspended
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(LOG_TAG, "Connection to the Google Api Client to retrieve user location has been Suspended");
+
+    }
+
+    //On Connection Failed
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e(LOG_TAG, "Connection to the Google Api Client to retrieve user location has failed");
+    }
+
+    //On Activity Start
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    //On Activity Stop
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
 }
