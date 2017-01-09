@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_number": "88685872494",
+    "firebase_url": "https://hangeo-db.firebaseio.com",
+    "project_id": "hangeo-db",
+    "storage_bucket": "hangeo-db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:88685872494:android:3f9ceda20a40e651",
+        "android_client_info": {
+          "package_name": "com.pujolsluis.android.hangeo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "88685872494-pdutovfolkvgp7obr6t5qiiocat6ijjo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pujolsluis.android.hangeo",
+            "certificate_hash": "E7C96752860314E40609D3F74E8200915FFB1B1F"
+          }
+        },
+        {
+          "client_id": "88685872494-jq75lhbbsofjgerpcth46p3brai8f5sp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [{ "current_key": "E7:C9:67:52:86:03:14:E4:06:09:D3:F7:4E:82:00:91:5F:FB:1B:1F"}],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "88685872494-jq75lhbbsofjgerpcth46p3brai8f5sp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
