@@ -490,8 +490,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             //Updating Map Polyline
                             updatePolylineOfLocations();
                         }else{
-                            List<LatLng> emptyList = new ArrayList<LatLng>();
-                            mPolyLine.setPoints(emptyList);
+                            List<LatLng> dummyPointList = new ArrayList<LatLng>();
+                            dummyPointList.add(new LatLng(0.0,0.0));
+                            mPolyLine.setPoints(dummyPointList);
                         }
 
                         mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -710,7 +711,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onLoadFinished(android.content.Loader<List<Route>> loader, List<Route> data) {
-        if (data != null && !data.isEmpty()) {
+        if (data != null && !data.isEmpty() && !mPolyLineSelectedPointList.isEmpty()) {
             Route route = data.get(0);
             mPolyLine.setPoints(route.getOverviewPolyLine());
         }
