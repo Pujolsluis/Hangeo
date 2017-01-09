@@ -269,7 +269,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        mPolyLine.setPoints(mPolyLinePointList);
         CameraPosition newPosition = CameraPosition.builder()
                 .target(target)
-                .zoom(17)
+                .zoom(15)
                 .bearing(0)
                 .build();
         flyTo(newPosition);
@@ -440,12 +440,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mSelectedMarkerslist.add(mLastMarker);
                         mPolyLineSelectedPointList.add(mLastMarker.getPosition());
 
-                        if(mPolyLineSelectedPointList.size() > 1)
+                        if(mPolyLineSelectedPointList.size() > 1) {
                             //Updating Map Polyline
                             updatePolylineOfLocations();
 
-                        //Updating Bounds Builder for Map
-                        updateMapBounds();
+
+                            //Updating Bounds Builder for Map
+                            updateMapBounds();
+                        }
 
                         mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
                         mPanelButton.setColorFilter(Color.RED);
@@ -494,7 +496,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                         //Updating Map Bounds
-                        if (!mPolyLineSelectedPointList.isEmpty())
+                        if (!mPolyLineSelectedPointList.isEmpty() && mPolyLineSelectedPointList.size() > 1)
                             updateMapBounds();
                         dialog.cancel();
                     }
@@ -540,7 +542,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Create new Camera Update to indicate where to move camera
         CameraUpdate newMapBounds =
-                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 48);
+                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 240);
 
         //Update Camera to new Bounds
         mGoogleMap.moveCamera(newMapBounds);
