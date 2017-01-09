@@ -2,13 +2,16 @@ package com.pujolsluis.android.hangeo;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -54,7 +57,8 @@ import java.util.List;
 import static com.pujolsluis.android.hangeo.R.id.map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
-        ActivityCompat.OnRequestPermissionsResultCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        ActivityCompat.OnRequestPermissionsResultCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LoaderManager.LoaderCallbacks<List<Route>>{
 
     static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
@@ -100,6 +104,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Request Location Identifier
     private static final int REQUEST_LOCATION = 0;
+
+    //Loader Manager
+    android.app.LoaderManager loaderManager;
+
+    //Loader to Request Directions For the selected locations ID
+    private static final int DIRECTIONS_LOADER_ID = 1;
+
+    //First Polyline Start
+    private Boolean mFirstPolylineStart = true;
+
+    //Directions API Base Request URL
+    private static final String DIRECTIONSAPI_REQUEST_URL = "https://maps.googleapis.com/maps/api/directions/json";
 
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
@@ -159,6 +175,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .build();
         }
 
+        // Get a reference to the LoaderManager, in order to interact with loaders.
+        loaderManager = getLoaderManager();
+
+
     }
 
 
@@ -190,16 +210,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mGoogleMap.setMyLocationEnabled(true);
         } else requestLocationPermission();
-
-
-        List<Route> routeList = null;
-        try {
-            routeList = DirectionsApiUtils.extractRoutes("{\n\"geocoded_waypoints\":[\n{\n\"geocoder_status\":\"OK\",\n\"place_id\":\"ChIJVxCyxRiKr44RhP9iu8MMS8M\",\n\"types\":[\"route\"]\n},\n{\n\"geocoder_status\":\"OK\",\n\"place_id\":\"ChIJf5RID-iJr44RA2bXsKKwUIs\",\n\"types\":[\"street_address\"]\n},\n{\n\"geocoder_status\":\"OK\",\n\"place_id\":\"ChIJlT0h7hdipY4RQoSRuAP-Nzc\",\n\"types\":[\"route\"]\n}\n],\n\"routes\":[\n{\n\"bounds\":{\n\"northeast\":{\n\"lat\":18.4875306,\n\"lng\":-69.92054089999999\n},\n\"southwest\":{\n\"lat\":18.4399629,\n\"lng\":-69.96356\n}\n},\n\"copyrights\":\"Datosdemapas©2017Google\",\n\"legs\":[\n{\n\"distance\":{\n\"text\":\"5,0km\",\n\"value\":5041\n},\n\"duration\":{\n\"text\":\"16min\",\n\"value\":941\n},\n\"end_address\":\"AvenidaGustavoMejiaRicart80,SantoDomingo,RepúblicaDominicana\",\n\"end_location\":{\n\"lat\":18.4754149,\n\"lng\":-69.92633169999999\n},\n\"start_address\":\"CalleCrisantemos,SantoDomingo,RepúblicaDominicana\",\n\"start_location\":{\n\"lat\":18.4874991,\n\"lng\":-69.961871\n},\n\"steps\":[\n{\n\"distance\":{\n\"text\":\"0,2km\",\n\"value\":227\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":77\n},\n\"end_location\":{\n\"lat\":18.4870692,\n\"lng\":-69.96356\n},\n\"html_instructions\":\"Dirígetehaciael\\u003cb\\u003eoeste\\u003c/b\\u003ehacia\\u003cb\\u003eCallelosCoralillos\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporParqueoProfesoresIntec(aladerecha).\\u003c/div\\u003e\",\n\"polyline\":{\n\"points\":\"{yyoBtl_jL?j@E~F?J?H@HBDR@`AA\"\n},\n\"start_location\":{\n\"lat\":18.4874991,\n\"lng\":-69.961871\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,4km\",\n\"value\":427\n},\n\"duration\":{\n\"text\":\"2min\",\n\"value\":106\n},\n\"end_location\":{\n\"lat\":18.4849556,\n\"lng\":-69.96029919999999\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003eizquierda\\u003c/b\\u003eenHeladosBonLosJardinesendireccióna\\u003cb\\u003eAv.JardinesdeFontainebleau\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporLisyBeautyCenter(alaizquierda).\\u003c/div\\u003e\",\n\"maneuver\":\"turn-left\",\n\"polyline\":{\n\"points\":\"ewyoBfw_jLb@cANYb@wARy@@QRkALWZ_@f@g@BE|@u@VSVSZ]f@w@Zc@\"\n},\n\"start_location\":{\n\"lat\":18.4870692,\n\"lng\":-69.96356\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,7km\",\n\"value\":712\n},\n\"duration\":{\n\"text\":\"3min\",\n\"value\":150\n},\n\"end_location\":{\n\"lat\":18.4815582,\n\"lng\":-69.95481669999999\n},\n\"html_instructions\":\"Giraligeramenteala\\u003cb\\u003ederecha\\u003c/b\\u003ehacia\\u003cb\\u003eAv.JardinesdeFontainebleau\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporPlazaCivilCenter(aladerecha).\\u003c/div\\u003e\",\n\"maneuver\":\"turn-slight-right\",\n\"polyline\":{\n\"points\":\"_jyoBzb_jLLCLIbBoARQ@APSPWP]JUH[vBwIRq@FQFQnCuGL[FODIz@_APITIXK\"\n},\n\"start_location\":{\n\"lat\":18.4849556,\n\"lng\":-69.96029919999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"1,2km\",\n\"value\":1210\n},\n\"duration\":{\n\"text\":\"2min\",\n\"value\":137\n},\n\"end_location\":{\n\"lat\":18.4828762,\n\"lng\":-69.94347259999999\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003eizquierda\\u003c/b\\u003ehacia\\u003cb\\u003eAv.JohnF.Kennedy\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporlaestacióndemetro(aladerecha)\\u003c/div\\u003e\",\n\"maneuver\":\"turn-left\",\n\"polyline\":{\n\"points\":\"wtxoBr`~iLCSOsAC[UeE?]EkBA_@A]E}AQyIAo@?GEkBCeAO{HGoBCq@Ac@AKASCUAIGc@Ki@AIKs@Mq@Kq@e@iCSeAMg@\"\n},\n\"start_location\":{\n\"lat\":18.4815582,\n\"lng\":-69.95481669999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,7km\",\n\"value\":706\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":70\n},\n\"end_location\":{\n\"lat\":18.4837988,\n\"lng\":-69.93718389999999\n},\n\"html_instructions\":\"Tomaelramaldela\\u003cb\\u003eizquierda\\u003c/b\\u003eendirección\\u003cb\\u003eExpresoJohnF.Kennedy\\u003c/b\\u003e\",\n\"polyline\":{\n\"points\":\"_}xoBty{iLa@i@AAq@gCMe@mBqGQg@IYAAI[ACIYGYEUCSCYCSAW?U?W?W@[BQBUD]Fg@pAeH\"\n},\n\"start_location\":{\n\"lat\":18.4828762,\n\"lng\":-69.94347259999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,9km\",\n\"value\":870\n},\n\"duration\":{\n\"text\":\"3min\",\n\"value\":176\n},\n\"end_location\":{\n\"lat\":18.4826155,\n\"lng\":-69.9290965\n},\n\"html_instructions\":\"Tomalasalidaparaincorporartea\\u003cb\\u003eAv.JohnF.Kennedy\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporCentrodeAtenciónEmpresarialClaro(aladerecha).\\u003c/div\\u003e\",\n\"maneuver\":\"ramp-right\",\n\"polyline\":{\n\"points\":\"wbyoBjrziLRWb@cCDUtAcILq@DU@MDWB[@Y@U?YNgHJmE@OF}CLaF\"\n},\n\"start_location\":{\n\"lat\":18.4837988,\n\"lng\":-69.93718389999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,8km\",\n\"value\":841\n},\n\"duration\":{\n\"text\":\"3min\",\n\"value\":193\n},\n\"end_location\":{\n\"lat\":18.4753851,\n\"lng\":-69.9267818\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003ederecha\\u003c/b\\u003ehacia\\u003cb\\u003eAv.Tiradentes\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporCentroCopiadoraNaco(aladerecha).\\u003c/div\\u003e\",\n\"maneuver\":\"turn-right\",\n\"polyline\":{\n\"points\":\"k{xoBz_yiL\\\\EfAOnASf@Iv@Oz@Ub@KbCi@HCpDw@`@I`Cm@|@SnHgBjCq@nA[@A\"\n},\n\"start_location\":{\n\"lat\":18.4826155,\n\"lng\":-69.9290965\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"48m\",\n\"value\":48\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":32\n},\n\"end_location\":{\n\"lat\":18.4754149,\n\"lng\":-69.92633169999999\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003eizquierda\\u003c/b\\u003eenDrinks2gohacia\\u003cb\\u003eAvenidaGustavoMejiaRicart\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003eEldestinoestáalaizquierda.\\u003c/div\\u003e\",\n\"maneuver\":\"turn-left\",\n\"polyline\":{\n\"points\":\"enwoBjqxiL?SCeA\"\n},\n\"start_location\":{\n\"lat\":18.4753851,\n\"lng\":-69.9267818\n},\n\"travel_mode\":\"DRIVING\"\n}\n],\n\"traffic_speed_entry\":[],\n\"via_waypoint\":[]\n},\n{\n\"distance\":{\n\"text\":\"7,6km\",\n\"value\":7632\n},\n\"duration\":{\n\"text\":\"17min\",\n\"value\":1013\n},\n\"end_address\":\"Calle1ra,SantoDomingo,RepúblicaDominicana\",\n\"end_location\":{\n\"lat\":18.4429023,\n\"lng\":-69.94241869999999\n},\n\"start_address\":\"AvenidaGustavoMejiaRicart80,SantoDomingo,RepúblicaDominicana\",\n\"start_location\":{\n\"lat\":18.4754149,\n\"lng\":-69.92633169999999\n},\n\"steps\":[\n{\n\"distance\":{\n\"text\":\"0,3km\",\n\"value\":334\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":55\n},\n\"end_location\":{\n\"lat\":18.475801,\n\"lng\":-69.92319519999999\n},\n\"html_instructions\":\"Dirígetehaciael\\u003cb\\u003eeste\\u003c/b\\u003een\\u003cb\\u003eAvenidaGustavoMejiaRicart\\u003c/b\\u003ehacia\\u003cb\\u003eCalleAlbertoLarancuent\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporDavidCrockett(aladerecha).\\u003c/div\\u003e\",\n\"polyline\":{\n\"points\":\"inwoBpnxiLKcDGiBGaAGk@M{AAQYeC?A\"\n},\n\"start_location\":{\n\"lat\":18.4754149,\n\"lng\":-69.92633169999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,6km\",\n\"value\":562\n},\n\"duration\":{\n\"text\":\"3min\",\n\"value\":180\n},\n\"end_location\":{\n\"lat\":18.4716233,\n\"lng\":-69.92054089999999\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003ederecha\\u003c/b\\u003eenTRANSLOGIChacia\\u003cb\\u003eCalleLuisAlberti\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporTorreOviedo(alaizquierda).\\u003c/div\\u003e\",\n\"maneuver\":\"turn-right\",\n\"polyline\":{\n\"points\":\"wpwoB~zwiLZIz@Od@EDAp@?ZAR?L?N?VIXIXOROPONMTQVYFEnAkANOtAcAVUvAuA`B_B\"\n},\n\"start_location\":{\n\"lat\":18.475801,\n\"lng\":-69.92319519999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"81m\",\n\"value\":81\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":19\n},\n\"end_location\":{\n\"lat\":18.4711319,\n\"lng\":-69.9211037\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003ederecha\\u003c/b\\u003eenGrupoDelphihacia\\u003cb\\u003eAv27deFebrero\\u003c/b\\u003e\",\n\"maneuver\":\"turn-right\",\n\"polyline\":{\n\"points\":\"svvoBjjwiLn@x@p@t@\"\n},\n\"start_location\":{\n\"lat\":18.4716233,\n\"lng\":-69.92054089999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"3,7km\",\n\"value\":3736\n},\n\"duration\":{\n\"text\":\"4min\",\n\"value\":212\n},\n\"end_location\":{\n\"lat\":18.4559228,\n\"lng\":-69.9524533\n},\n\"html_instructions\":\"Tomaelramaldela\\u003cb\\u003eizquierda\\u003c/b\\u003eendirección\\u003cb\\u003eExpreso27deFebrero\\u003c/b\\u003e/\\u003cb\\u003eCarretera3\\u003c/b\\u003e\",\n\"polyline\":{\n\"points\":\"qsvoBzmwiLdBbBbFtGf@r@\\\\b@RZBDHLLT^r@Zt@`@dA~BjGtCjHzElLv@nBLXbKtV|DrJPd@rAbDhGjON`@h@nAjBrE^~@b@fAPb@LZLn@fApFvBvJZzAxA|GR|@XnAdAhD`B|FHX@BvAlFFZ^r@P`@Vn@\"\n},\n\"start_location\":{\n\"lat\":18.4711319,\n\"lng\":-69.9211037\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,3km\",\n\"value\":258\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":46\n},\n\"end_location\":{\n\"lat\":18.4548408,\n\"lng\":-69.9546137\n},\n\"html_instructions\":\"Mantenteala\\u003cb\\u003ederecha\\u003c/b\\u003eparacontinuarpor\\u003cb\\u003eAv27deFebrero\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporMini-VallaEudom(aladerecha).\\u003c/div\\u003e\",\n\"maneuver\":\"keep-right\",\n\"polyline\":{\n\"points\":\"otsoBxq}iLF`@FRDN`DpHP^LV\"\n},\n\"start_location\":{\n\"lat\":18.4559228,\n\"lng\":-69.9524533\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"1,4km\",\n\"value\":1425\n},\n\"duration\":{\n\"text\":\"5min\",\n\"value\":305\n},\n\"end_location\":{\n\"lat\":18.4439423,\n\"lng\":-69.94774099999999\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003eizquierda\\u003c/b\\u003eenBorbónRodriguezhacia\\u003cb\\u003eAvNúñezdeCáceres\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporVAGImportCxA(aladerecha).\\u003c/div\\u003e\",\n\"maneuver\":\"turn-left\",\n\"polyline\":{\n\"points\":\"wmsoBh_~iLJEFCJGLGnIwDZQNIPGx@_@rAc@VMjAm@RIlLcFRGhCkA|CsAZMj@YxBaAl@YnAq@~@g@XOTQNId@i@lCiDb@g@LQ\\\\e@RS\"\n},\n\"start_location\":{\n\"lat\":18.4548408,\n\"lng\":-69.9546137\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,3km\",\n\"value\":262\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":16\n},\n\"end_location\":{\n\"lat\":18.4420697,\n\"lng\":-69.9462746\n},\n\"html_instructions\":\"Continúapor\\u003cb\\u003eAvenidaJoséNuñezdeCáceres\\u003c/b\\u003e.\",\n\"polyline\":{\n\"points\":\"siqoBjt|iLb@g@b@e@DEPSLOLIVUb@Yb@Yh@]d@Ud@Sb@Q\"\n},\n\"start_location\":{\n\"lat\":18.4439423,\n\"lng\":-69.94774099999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,3km\",\n\"value\":295\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":47\n},\n\"end_location\":{\n\"lat\":18.4400655,\n\"lng\":-69.9470144\n},\n\"html_instructions\":\"Incorpóratea\\u003cb\\u003eAv.Independencia\\u003c/b\\u003e\",\n\"polyline\":{\n\"points\":\"}}poBdk|iLtGiAf@jAp@xA^v@\"\n},\n\"start_location\":{\n\"lat\":18.4420697,\n\"lng\":-69.9462746\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,5km\",\n\"value\":543\n},\n\"duration\":{\n\"text\":\"2min\",\n\"value\":94\n},\n\"end_location\":{\n\"lat\":18.4419472,\n\"lng\":-69.94241599999999\n},\n\"html_instructions\":\"Giratotalmenteala\\u003cb\\u003eizquierda\\u003c/b\\u003eenDrinks2GoAv.Independenciaypermaneceen\\u003cb\\u003eAv.Independencia\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003ePasaporSubestaciónEléctricaMatadero(aladerechaa350&nbsp;m)\\u003c/div\\u003e\",\n\"maneuver\":\"turn-sharp-left\",\n\"polyline\":{\n\"points\":\"mqpoBxo|iLTCk@qAq@{Ae@_AEKs@mBQg@EOCKe@mBGQi@wBGWMi@Ok@Uu@_@iA\"\n},\n\"start_location\":{\n\"lat\":18.4400655,\n\"lng\":-69.9470144\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"0,1km\",\n\"value\":100\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":30\n},\n\"end_location\":{\n\"lat\":18.4427897,\n\"lng\":-69.942736\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003eizquierda\\u003c/b\\u003ehacia\\u003cb\\u003eCalleProyecto\\u003c/b\\u003e\",\n\"maneuver\":\"turn-left\",\n\"polyline\":{\n\"points\":\"e}poBbs{iLSFsCv@\"\n},\n\"start_location\":{\n\"lat\":18.4419472,\n\"lng\":-69.94241599999999\n},\n\"travel_mode\":\"DRIVING\"\n},\n{\n\"distance\":{\n\"text\":\"36m\",\n\"value\":36\n},\n\"duration\":{\n\"text\":\"1min\",\n\"value\":9\n},\n\"end_location\":{\n\"lat\":18.4429023,\n\"lng\":-69.94241869999999\n},\n\"html_instructions\":\"Giraala\\u003cb\\u003ederecha\\u003c/b\\u003eenColmaditodelosvierneshacia\\u003cb\\u003eCalle1ra\\u003c/b\\u003e\\u003cdivstyle=\\\"font-size:0.9em\\\"\\u003eEldestinoestáaladerecha.\\u003c/div\\u003e\",\n\"maneuver\":\"turn-right\",\n\"polyline\":{\n\"points\":\"mbqoBbu{iLU_A\"\n},\n\"start_location\":{\n\"lat\":18.4427897,\n\"lng\":-69.942736\n},\n\"travel_mode\":\"DRIVING\"\n}\n],\n\"traffic_speed_entry\":[],\n\"via_waypoint\":[]\n}\n],\n\"overview_polyline\":{\n\"points\":\"{yyoBtl_jLE`IDNtA?r@}Av@qCT}Ah@w@j@m@tAiAr@q@bA{AZMvBaBRUb@u@Tq@jCiKNc@|CqHLYz@_APIn@USgBYaFEiC[uNi@kVI_Aa@kCYcBy@oEMg@a@i@s@iCwCyJW{@Mo@Gm@EyAH{ALeApAeHRWh@yCbBuJPwARqJb@}Q|Es@zG{AzD{@bDw@lJ{BzEmA@UOiFGiBOmBi@uFbCa@nBAN?VIr@YjA_A~B{BlByAxDuD`BnBdBbBbFtGdAvAV`@Vb@z@hB`DpIpJxUfSrf@xQbd@^~@tA`H`GnXXnAdAhDjBvGxApFFZ^r@h@pANt@fExJl@YlK{ElCcAbB{@~QaI~I}D|BkAxAw@d@[rDsEbBsB~AgBvAiAlAw@jAi@b@QtGiAxAdD^v@TC}AmDk@kAeAuCw@{CoAeFu@_CgD~@U_A\"\n},\n\"summary\":\"Av.JohnF.Kennedy\",\n\"warnings\":[],\n\"waypoint_order\":[0]\n}\n],\n\"status\":\"OK\"\n}");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Route route = routeList.get(0);
-        mPolyLine.setPoints(route.getOverviewPolyLine());
 
     }
 
@@ -430,8 +440,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mSelectedMarkerslist.add(mLastMarker);
                         mPolyLineSelectedPointList.add(mLastMarker.getPosition());
 
-                        //Updating Map Polyline
-                        updatePolylineOfLocations();
+                        if(mPolyLineSelectedPointList.size() > 1)
+                            //Updating Map Polyline
+                            updatePolylineOfLocations();
 
                         //Updating Bounds Builder for Map
                         updateMapBounds();
@@ -473,8 +484,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mPolyLineSelectedPointList.remove(mLastMarker.getPosition());
                         mLastMarker.remove();
 
-                        //Updating Map Polyline
-                        updatePolylineOfLocations();
+                        if(mPolyLineSelectedPointList.size() > 1) {
+                            //Updating Map Polyline
+                            updatePolylineOfLocations();
+                        }else{
+                            List<LatLng> emptyList = new ArrayList<LatLng>();
+                            mPolyLine.setPoints(emptyList);
+                        }
 
                         mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                         //Updating Map Bounds
@@ -498,7 +514,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Update the polyline between locations
     private void updatePolylineOfLocations() {
-        mPolyLine.setPoints(mPolyLineSelectedPointList);
+
+        if(mPolyLineSelectedPointList.size() < 2) return;
+
+        if(mFirstPolylineStart){
+
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+            // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface).
+            loaderManager.initLoader(DIRECTIONS_LOADER_ID, null, this);
+            mFirstPolylineStart = false;
+
+        }else loaderManager.restartLoader(DIRECTIONS_LOADER_ID, null, this);
+
     }
 
     //Updating the map bounds to move camera so it includes all new locations in the map camera
@@ -645,4 +673,51 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleApiClient.disconnect();
         super.onStop();
     }
+
+    @Override
+    public Loader onCreateLoader(int i, Bundle bundle) {
+
+        Uri baseUri = Uri.parse(DIRECTIONSAPI_REQUEST_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        LatLng origin, destination;
+        origin = mPolyLineSelectedPointList.get(0);
+        String originLatLng = "" + origin.latitude + "," + origin.longitude;
+        destination = mPolyLineSelectedPointList.get(mPolyLineSelectedPointList.size()-1);
+        String destinationLatLng = "" + destination.latitude + "," + destination.longitude;
+        String waypoints = "";
+        int sizeOfList = mPolyLineSelectedPointList.size()-1;
+
+        for(int j=1; j<sizeOfList; j++){
+            LatLng tempLatLng = mPolyLineSelectedPointList.get(j);
+            if(j<sizeOfList) waypoints += tempLatLng.latitude + "," + tempLatLng.longitude + "|";
+            else waypoints += tempLatLng.latitude + "," + tempLatLng.longitude;
+        }
+
+        uriBuilder.appendQueryParameter("origin", originLatLng );
+        uriBuilder.appendQueryParameter("destination", destinationLatLng);
+
+        if(waypoints != "") uriBuilder.appendQueryParameter("waypoints", waypoints);
+
+        String key = getResources().getString(R.string.google_maps_key);
+        uriBuilder.appendQueryParameter("key", key);
+        Log.d(LOG_TAG, "URL TO API: " + uriBuilder.toString());
+        return new DirectionsLoader(this, uriBuilder.toString());
+
+    }
+
+    @Override
+    public void onLoadFinished(android.content.Loader<List<Route>> loader, List<Route> data) {
+        if (data != null && !data.isEmpty()) {
+            Route route = data.get(0);
+            mPolyLine.setPoints(route.getOverviewPolyLine());
+        }
+    }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<List<Route>> loader) {
+        List<LatLng> emptyList = new ArrayList<LatLng>();
+        mPolyLine.setPoints(emptyList);
+    }
+
 }
