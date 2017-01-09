@@ -72,13 +72,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean mapReady = false;
     //View to get the main activity layout and use it in the permission method
     private View mLayout;
-    //Camera Position
-    private CameraPosition USER_LOCATION;
     //Google API Cliente to retrieve user location data
     private GoogleApiClient mGoogleApiClient;
-    //User Last Location
-    private Location mLastLocation;
-    private LatLng mLastLocationLatLng;
     //FirstOnStart
     private Boolean mFirstOnStart = true;
     //Last Marker on long click
@@ -94,10 +89,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Planel Layout
     private SlidingUpPanelLayout mSlidingPanelLayout;
-
-    //Dialogs to ADD and DELETE Locations
-    private Dialog addAlertDialog;
-    private Dialog deleteAlertDialog;
 
     //Panel Header Button
     private ImageButton mPanelButton;
@@ -154,8 +145,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         initializeGoogleMapsPlacesFragment();
 
         //Initialize USER_LOCATION
-        mLastLocationLatLng = new LatLng(18.6976745, -71.2865409);
-        USER_LOCATION = CameraPosition.builder()
+        LatLng mLastLocationLatLng = new LatLng(18.6976745, -71.2865409);
+
+        CameraPosition USER_LOCATION = CameraPosition.builder()
                 .target(mLastLocationLatLng)
                 .zoom((float) 15)
                 .bearing(0)
@@ -369,7 +361,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Updating the Panel Header button
     private void updatePanelHeaderButton(Marker marker) {
         if (mSelectedMarkersMap.containsKey(marker)) {
-            mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+            mPanelButton.setImageResource(R.drawable.ic_delete_forever_black_36dp);
             mPanelButton.setColorFilter(Color.RED);
         } else {
             mPanelButton.setImageResource(R.drawable.ic_add_location_black);
@@ -449,7 +441,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             updateMapBounds();
                         }
 
-                        mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+                        mPanelButton.setImageResource(R.drawable.ic_delete_forever_black_36dp);
                         mPanelButton.setColorFilter(Color.RED);
 
                         //Close Alert Dialog
@@ -465,7 +457,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-        addAlertDialog = builderForAddingLocationDialog.create();
+        Dialog addAlertDialog = builderForAddingLocationDialog.create();
         addAlertDialog.show();
     }
 
@@ -511,7 +503,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-        deleteAlertDialog = builderForAddingLocationDialog.create();
+        Dialog deleteAlertDialog = builderForAddingLocationDialog.create();
         deleteAlertDialog.show();
     }
 
@@ -630,7 +622,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             //Moving Map Camara to user position if its the first time he opens the app
             if(mFirstOnStart) {
-                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                         mGoogleApiClient);
                 if (mLastLocation != null) {
                     CameraPosition cameraStartPosition = CameraPosition.builder()
