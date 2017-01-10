@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#32d8c1"
-    tools:context="com.pujolsluis.android.hangeo.MainActivity">
+    tools:context="com.pujolsluis.android.hangeo.WelcomeScreenActivity">
 
         <ImageView
             android:layout_alignParentTop="true"

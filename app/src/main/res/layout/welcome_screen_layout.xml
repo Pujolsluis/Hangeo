@@ -34,7 +34,7 @@
             android:textColor="@color/colorWelcomeScreenFont"
             android:text="@string/signup_welcome_screen"
             android:textStyle="normal|bold"
-            android:textSize="24sp" />
+            android:textSize="24sp"/>
     </LinearLayout>
 
     <LinearLayout

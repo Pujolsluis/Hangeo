@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
             android:ems="10"
-            android:id="@+id/register_username_input"
+            android:id="@+id/editText_SignUpLayout_usernameInput"
             android:selectAllOnFocus="false"
             android:hint="@string/username_string" />
 
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
             android:ems="10"
-            android:id="@+id/register_email_input"
+            android:id="@+id/editText_SignUpLayout_emailInput"
             android:hint="@string/email_string" />
 
         <EditText
@@ -36,12 +36,12 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="10"
-            android:id="@+id/register_password_input"
+            android:id="@+id/editText_SignUpLayout_passwordInput"
             android:hint="@string/password_string" />
     </LinearLayout>
 
     <Button
-        android:id="@+id/b_sRegister_register"
+        android:id="@+id/button_SignUpLayout_SignUp"
         android:text="@string/register_string"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -104,5 +104,13 @@
             android:background="@color/colorAccent"/>&ndash;&gt;
 
     </LinearLayout>-->
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone" />
 
 </RelativeLayout>
