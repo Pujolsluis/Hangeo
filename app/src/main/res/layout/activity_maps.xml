@@ -104,7 +104,6 @@
                             android:id="@+id/panelHeader_TextView_dragView"
                             android:layout_width="match_parent"
                             android:layout_height="68dp"
-                            android:text="Sliding Panesadfasfasdf asdfasdfasdfasdfsfasfasdfsdal"
                             android:maxLength="28"
                             android:background="@color/colorPrimary"
                             android:textColor="@android:color/white"

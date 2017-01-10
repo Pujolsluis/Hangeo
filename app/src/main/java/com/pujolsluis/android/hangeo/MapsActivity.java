@@ -2,13 +2,16 @@ package com.pujolsluis.android.hangeo;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -26,8 +29,10 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -47,11 +52,13 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.pujolsluis.android.hangeo.R.id.map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LoaderManager.LoaderCallbacks<List<Route>>{
 
     static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
@@ -65,15 +72,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean mapReady = false;
     //View to get the main activity layout and use it in the permission method
     private View mLayout;
-    //Camera Position
-    private CameraPosition USER_LOCATION;
     //Google API Cliente to retrieve user location data
     private GoogleApiClient mGoogleApiClient;
-    //User Last Location
-    private Location mLastLocation;
-    private LatLng mLastLocationLatLng;
     //FirstOnStart
-    private Boolean FirstonStart = true;
+    private Boolean mFirstOnStart = true;
     //Last Marker on long click
     private Marker mLastMarker;
     //PolyLine Between created markers
@@ -88,15 +90,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Planel Layout
     private SlidingUpPanelLayout mSlidingPanelLayout;
 
-    //Dialogs to ADD and DELETE Locations
-    private Dialog addAlertDialog;
-    private Dialog deleteAlertDialog;
-
     //Panel Header Button
     private ImageButton mPanelButton;
 
     //Request Location Identifier
     private static final int REQUEST_LOCATION = 0;
+
+    //Loader Manager
+    android.app.LoaderManager loaderManager;
+
+    //Loader to Request Directions For the selected locations ID
+    private static final int DIRECTIONS_LOADER_ID = 1;
+
+    //First Polyline Start
+    private Boolean mFirstPolylineStart = true;
+
+    //Directions API Base Request URL
+    private static final String DIRECTIONSAPI_REQUEST_URL = "https://maps.googleapis.com/maps/api/directions/json";
 
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
@@ -135,8 +145,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         initializeGoogleMapsPlacesFragment();
 
         //Initialize USER_LOCATION
-        mLastLocationLatLng = new LatLng(18.6976745, -71.2865409);
-        USER_LOCATION = CameraPosition.builder()
+        LatLng mLastLocationLatLng = new LatLng(18.6976745, -71.2865409);
+
+        CameraPosition USER_LOCATION = CameraPosition.builder()
                 .target(mLastLocationLatLng)
                 .zoom((float) 15)
                 .bearing(0)
@@ -146,6 +157,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         initializeSlidingPanel();
 
         mPanelButton = (ImageButton) findViewById(R.id.add_location_to_plan);
+
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+        // Get a reference to the LoaderManager, in order to interact with loaders.
+        loaderManager = getLoaderManager();
 
 
     }
@@ -176,10 +199,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         //Verifying and Asking for the users device location, to initialize the MyLocations Google Maps Ui Tool
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mGoogleMap.setMyLocationEnabled(true);
         } else requestLocationPermission();
-
 
     }
 
@@ -239,7 +261,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        mPolyLine.setPoints(mPolyLinePointList);
         CameraPosition newPosition = CameraPosition.builder()
                 .target(target)
-                .zoom(17)
+                .zoom(15)
                 .bearing(0)
                 .build();
         flyTo(newPosition);
@@ -251,6 +273,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Method that gets called when an error occurs with a place selected from the search box
     @Override
     public void onError(Status status) {
+        Log.e(LOG_TAG, "There has been an error retrieving the place Status: " + status.getStatusMessage());
         return;
     }
 
@@ -338,7 +361,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Updating the Panel Header button
     private void updatePanelHeaderButton(Marker marker) {
         if (mSelectedMarkersMap.containsKey(marker)) {
-            mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+            mPanelButton.setImageResource(R.drawable.ic_delete_forever_black_36dp);
             mPanelButton.setColorFilter(Color.RED);
         } else {
             mPanelButton.setImageResource(R.drawable.ic_add_location_black);
@@ -409,13 +432,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mSelectedMarkerslist.add(mLastMarker);
                         mPolyLineSelectedPointList.add(mLastMarker.getPosition());
 
-                        //Updating Map Polyline
-                        updatePolylineOfLocations();
+                        if(mPolyLineSelectedPointList.size() > 1) {
+                            //Updating Map Polyline
+                            updatePolylineOfLocations();
 
-                        //Updating Bounds Builder for Map
-                        updateMapBounds();
 
-                        mPanelButton.setImageResource(R.drawable.ic_delete_location_trash_bin);
+                            //Updating Bounds Builder for Map
+                            updateMapBounds();
+                        }
+
+                        mPanelButton.setImageResource(R.drawable.ic_delete_forever_black_36dp);
                         mPanelButton.setColorFilter(Color.RED);
 
                         //Close Alert Dialog
@@ -431,7 +457,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-        addAlertDialog = builderForAddingLocationDialog.create();
+        Dialog addAlertDialog = builderForAddingLocationDialog.create();
         addAlertDialog.show();
     }
 
@@ -452,12 +478,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mPolyLineSelectedPointList.remove(mLastMarker.getPosition());
                         mLastMarker.remove();
 
-                        //Updating Map Polyline
-                        updatePolylineOfLocations();
+                        if(mPolyLineSelectedPointList.size() > 1) {
+                            //Updating Map Polyline
+                            updatePolylineOfLocations();
+                        }else{
+                            List<LatLng> dummyPointList = new ArrayList<LatLng>();
+                            dummyPointList.add(new LatLng(0.0,0.0));
+                            mPolyLine.setPoints(dummyPointList);
+                        }
 
                         mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                         //Updating Map Bounds
-                        if (!mPolyLineSelectedPointList.isEmpty())
+                        if (!mPolyLineSelectedPointList.isEmpty() && mPolyLineSelectedPointList.size() > 1)
                             updateMapBounds();
                         dialog.cancel();
                     }
@@ -471,13 +503,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-        deleteAlertDialog = builderForAddingLocationDialog.create();
+        Dialog deleteAlertDialog = builderForAddingLocationDialog.create();
         deleteAlertDialog.show();
     }
 
     //Update the polyline between locations
     private void updatePolylineOfLocations() {
-        mPolyLine.setPoints(mPolyLineSelectedPointList);
+
+        if(mPolyLineSelectedPointList.size() < 2) return;
+
+        if(mFirstPolylineStart){
+
+            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+            // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
+            // because this activity implements the LoaderCallbacks interface).
+            loaderManager.initLoader(DIRECTIONS_LOADER_ID, null, this);
+            mFirstPolylineStart = false;
+
+        }else loaderManager.restartLoader(DIRECTIONS_LOADER_ID, null, this);
+
     }
 
     //Updating the map bounds to move camera so it includes all new locations in the map camera
@@ -491,7 +535,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Create new Camera Update to indicate where to move camera
         CameraUpdate newMapBounds =
-                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 48);
+                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 240);
 
         //Update Camera to new Bounds
         mGoogleMap.moveCamera(newMapBounds);
@@ -568,6 +612,107 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    //On Connected to the Google Api
+    @Override
+    public void onConnected(Bundle connectionHint) {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            //Moving Map Camara to user position if its the first time he opens the app
+            if(mFirstOnStart) {
+                Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                        mGoogleApiClient);
+                if (mLastLocation != null) {
+                    CameraPosition cameraStartPosition = CameraPosition.builder()
+                            .target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
+                            .zoom(15)
+                            .bearing(0)
+                            .build();
+                    flyTo(cameraStartPosition);
+                }
+                mFirstOnStart = false;
+            }else return;
+
+        } else requestLocationPermission();
+
+
+    }
+
+
+
+    //On Connection Suspended
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(LOG_TAG, "Connection to the Google Api Client to retrieve user location has been Suspended");
+
+    }
+
+    //On Connection Failed
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e(LOG_TAG, "Connection to the Google Api Client to retrieve user location has failed");
+    }
+
+    //On Activity Start
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    //On Activity Stop
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public Loader onCreateLoader(int i, Bundle bundle) {
+
+        Uri baseUri = Uri.parse(DIRECTIONSAPI_REQUEST_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        LatLng origin, destination;
+        origin = mPolyLineSelectedPointList.get(0);
+        String originLatLng = "" + origin.latitude + "," + origin.longitude;
+        destination = mPolyLineSelectedPointList.get(mPolyLineSelectedPointList.size()-1);
+        String destinationLatLng = "" + destination.latitude + "," + destination.longitude;
+        String waypoints = "";
+        int sizeOfList = mPolyLineSelectedPointList.size()-1;
+
+        for(int j=1; j<sizeOfList; j++){
+            LatLng tempLatLng = mPolyLineSelectedPointList.get(j);
+            if(j<sizeOfList) waypoints += tempLatLng.latitude + "," + tempLatLng.longitude + "|";
+            else waypoints += tempLatLng.latitude + "," + tempLatLng.longitude;
+        }
+
+        uriBuilder.appendQueryParameter("origin", originLatLng );
+        uriBuilder.appendQueryParameter("destination", destinationLatLng);
+
+        if(waypoints != "") uriBuilder.appendQueryParameter("waypoints", waypoints);
+
+        String key = getResources().getString(R.string.google_maps_key);
+        uriBuilder.appendQueryParameter("key", key);
+        Log.d(LOG_TAG, "URL TO API: " + uriBuilder.toString());
+        return new DirectionsLoader(this, uriBuilder.toString());
+
+    }
+
+    @Override
+    public void onLoadFinished(android.content.Loader<List<Route>> loader, List<Route> data) {
+        if (data != null && !data.isEmpty() && !mPolyLineSelectedPointList.isEmpty()) {
+            Route route = data.get(0);
+            mPolyLine.setPoints(route.getOverviewPolyLine());
+        }
+    }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<List<Route>> loader) {
+        List<LatLng> emptyList = new ArrayList<LatLng>();
+        mPolyLine.setPoints(emptyList);
     }
 
 }
