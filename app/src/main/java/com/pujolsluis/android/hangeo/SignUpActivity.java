@@ -1,5 +1,6 @@
 package com.pujolsluis.android.hangeo;
 
+import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
@@ -18,11 +19,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText inputUsername, inputEmail, inputPassword ;
+    private EditText inputEmail, inputPassword ;
     private Button buttonSignUp;
-    private FirebaseAuth auth;
+    private ProgressDialog progressDialog;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,37 +32,51 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         //Get instance for firebase authentification
-        auth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
 
         buttonSignUp = (Button) findViewById(R.id.button_SignUpLayout_SignUp);
-        inputUsername = (EditText) findViewById(R.id.editText_SignUpLayout_usernameInput);
         inputEmail = (EditText) findViewById(R.id.editText_SignUpLayout_emailInput);
         inputPassword = (EditText) findViewById(R.id.editText_SignUpLayout_passwordInput);
+        progressDialog = new ProgressDialog(this);
+        buttonSignUp.setOnClickListener(this);
 
-        buttonSignUp.setOnClickListener(new View.OnClickListener(){
+    }
 
-            @Override
-            public void onClick(View v) {
-                String username = inputUsername.getText().toString().trim();
-                String password = inputPassword.getText().toString().trim();
-                String email = inputEmail.getText().toString().trim();
+    @Override
+    public void onClick(View v) {
+        if (v == buttonSignUp){
+            registerUser();
+        }
+    }
 
-                if(TextUtils.isEmpty(username)){
-                    Toast.makeText(getApplicationContext(), "Please enter a valid username", Toast.LENGTH_SHORT).show();
-                }
+    private void registerUser() {
+        String email = inputEmail.getText().toString().trim();
+        String password = inputPassword.getText().toString().trim();
 
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(getApplicationContext(), "Please enter a valid email", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+        if (TextUtils.isEmpty(email)){
+            Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(getApplicationContext(), "Please enter a valid password", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+        if (TextUtils.isEmpty(password)){
+            Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                progressBar.setVisibility(View.VISIBLE);
-            }
-        });
+        progressDialog.setMessage("Registering user ...");
+        progressDialog.show();
+
+        firebaseAuth.createUserWithEmailAndPassword(email,password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()){
+                            Toast.makeText(SignUpActivity.this, "Registered successfully!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(SignUpActivity.this, "Could not register, please try again!", Toast.LENGTH_SHORT).show();
+                            progressDialog.hide();
+                        }
+                    }
+                });
     }
 }

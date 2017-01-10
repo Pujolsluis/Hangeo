@@ -31,6 +31,7 @@ public class WelcomeScreenActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(context, SignUpActivity.class);
                 startActivity(intent);
+                finish();
             }
 
         });

@@ -17,15 +17,6 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/editText_SignUpLayout_usernameInput"
-            android:selectAllOnFocus="false"
-            android:hint="@string/username_string" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
             android:ems="10"
             android:id="@+id/editText_SignUpLayout_emailInput"
@@ -38,18 +29,16 @@
             android:ems="10"
             android:id="@+id/editText_SignUpLayout_passwordInput"
             android:hint="@string/password_string" />
-    </LinearLayout>
 
-    <Button
-        android:id="@+id/button_SignUpLayout_SignUp"
-        android:text="@string/register_string"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/register_layout_inputs"
-        android:padding="10dp"
-        android:textColor="@color/colorAccent"
-        android:layout_centerHorizontal="true"
-        />
+        <Button
+            android:id="@+id/button_SignUpLayout_SignUp"
+            android:text="@string/register_string"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColor="@color/colorAccent"
+            />
+    </LinearLayout>
 
     <!--<TextView
         android:id="@+id/register_textview_ors"
@@ -104,13 +93,5 @@
             android:background="@color/colorAccent"/>&ndash;&gt;
 
     </LinearLayout>-->
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center|bottom"
-        android:layout_marginBottom="20dp"
-        android:visibility="gone" />
 
 </RelativeLayout>
