@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText inputEmail, inputPassword ;
-    private Button buttonSignUp, buttonForgotPassword;
+    private Button buttonSignUp, buttonForgotPassword, buttonLogin;
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -48,15 +48,16 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         };
 
         buttonSignUp = (Button) findViewById(R.id.button_SignUpLayout_SignUp);
-        buttonForgotPassword = (Button) findViewById(R.id.btn_reset_password); 
-        
+        buttonForgotPassword = (Button) findViewById(R.id.btn_reset_password);
+        buttonLogin = (Button) findViewById(R.id.button_goToLogin);
+
         inputEmail = (EditText) findViewById(R.id.editText_SignUpLayout_emailInput);
         inputPassword = (EditText) findViewById(R.id.password);
         progressDialog = new ProgressDialog(this);
         
         buttonSignUp.setOnClickListener(this);
         buttonForgotPassword.setOnClickListener(this);
-        
+        buttonLogin.setOnClickListener(this);
     }
 
     @Override
@@ -83,18 +84,18 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             goToForgotPassword();
         }
 
-        /*if (v == buttonLogin){
+        if (v == buttonLogin){
             goToLogin();
-        }*/
+        }
+    }
+
+    private void goToLogin() {
+            startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
     }
 
     private void goToForgotPassword() {
             startActivity(new Intent(SignUpActivity.this, ForgotPassword.class));
     }
-
-   /* private void goToLogin() {
-        startActivity(new Intent(SignUpActivity.this, ForgotPassword.class));
-    }*/
 
 
 
