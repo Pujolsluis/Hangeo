@@ -10,31 +10,35 @@ import android.widget.Button;
 
 public class WelcomeScreenActivity extends AppCompatActivity {
 
-    Button bSignUp;
+    private Button bSignUp;
+    private Button bLogin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_screen_layout);
-        addListenerOnSignUpButton();
-    }
-
-    public void addListenerOnSignUpButton() {
-
-        final Context context = this;
 
         bSignUp = (Button) findViewById(R.id.button_signUp);
+        bLogin = (Button) findViewById(R.id.welcome_button_login);
 
         bSignUp.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
 
-                Intent intent = new Intent(context, SignUpActivity.class);
+                Intent intent = new Intent(WelcomeScreenActivity.this, SignUpActivity.class);
                 startActivity(intent);
-                finish();
             }
 
         });
 
+
+        bLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                Intent intent = new Intent(WelcomeScreenActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

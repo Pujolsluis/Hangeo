@@ -21,4 +21,9 @@
     <string name="hint_email">Email</string>
     <string name="btn_reset_password">Reset Password</string>
     <string name="btn_back">Back</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_link_to_register">You\'re not a member yet? Get registered now</string>
+    <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
+    <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
 </resources>
