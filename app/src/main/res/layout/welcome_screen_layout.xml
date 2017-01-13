@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:id="@+id/WelcomeLayoutBottomButtons"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/welcome_button_login"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:layout_weight="1"
+            style="?android:attr/borderlessButtonStyle"
+            android:textColor="@color/colorWelcomeScreenFont"
+            android:background="@color/colorAccent"
+            android:text="@string/login_welcome_screen"
+            android:textStyle="normal|bold"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/button_signUp"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:layout_weight="1"
+            style="?android:attr/borderlessButtonStyle"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/colorWelcomeScreenFont"
+            android:text="@string/signup_welcome_screen"
+            android:textStyle="normal|bold"
+            android:textSize="24sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_above="@id/WelcomeLayoutBottomButtons">
+
+        <ImageView
+            android:id="@+id/ImageView_WelcomeScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/hangeo_app_land"
+            android:scaleType="centerCrop"/>
+    </LinearLayout>
+
+</RelativeLayout>

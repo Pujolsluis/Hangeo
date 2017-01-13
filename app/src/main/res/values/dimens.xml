@@ -7,4 +7,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="list_item_avatar_size">32dp</dimen>
     <dimen name="list_loc_icon_size">32dp</dimen>
+    <dimen name="logo_w_h">100dp</dimen>
 </resources>
