@@ -98,8 +98,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onSignedInInitialize(FirebaseUser user) {
-        mUser = user;
-
+        if(user != null) {
+            mUser = user;
+        }
     }
 
     @Override
