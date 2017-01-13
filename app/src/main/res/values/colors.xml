@@ -5,4 +5,5 @@
     <color name="colorAccent">#64b5f6</color>
     <color name="colorTextInFrontOfPrimary">#FFFFFF</color>
     <color name="colorLightPrimaryColor">#FFFFFF</color>
+    <color name="colorWelcomeScreenFont">#FAFAFA</color>
 </resources>

@@ -633,11 +633,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     flyTo(cameraStartPosition);
                 }
                 mFirstOnStart = false;
-            }else return;
-
+            }
         } else requestLocationPermission();
-
-
+        
     }
 
 

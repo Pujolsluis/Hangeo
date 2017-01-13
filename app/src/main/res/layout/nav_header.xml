@@ -10,9 +10,12 @@
     android:gravity="bottom">
 
     <TextView
+        android:id="@+id/nav_header_user_displayName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Username"
+        android:text="FirstName LastName"
+        android:textSize="14sp"
+        android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
 </LinearLayout>
