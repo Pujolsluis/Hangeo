@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:padding="16dp"
     android:background="@android:color/white">
 
 
@@ -28,12 +28,14 @@
             android:layout_width="@dimen/logo_w_h"
             android:layout_height="@dimen/logo_w_h"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="32dp"
             android:src="@mipmap/ic_launcher" />
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            >
 
             <EditText
                 android:layout_width="match_parent"
@@ -50,7 +52,8 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            >
 
             <EditText
                 android:layout_width="match_parent"
@@ -69,9 +72,9 @@
         <Button
             android:id="@+id/button_SignUpLayout_SignUp"
             style="?android:textAppearanceSmall"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:background="@android:color/darker_gray"
             android:text="@string/action_sign_in_short"
             android:textColor="@android:color/black"
@@ -79,24 +82,25 @@
 
         <Button
             android:id="@+id/btn_reset_password"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:background="@null"
             android:text="@string/btn_forgot_password"
             android:textAllCaps="false"
+            android:paddingTop="32dp"
+            android:textSize="14sp"
             android:textColor="@color/colorAccent"
-            android:layout_above="@id/button_SignUpLayout_SignUp"/>
+            />
 
         <Button
             android:id="@+id/button_goToLogin"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"
             android:text="@string/btn_link_to_login"
             android:textAllCaps="false"
             android:textColor="@color/colorAccent"
-            android:textSize="15dp"
+            android:textSize="16sp"
             android:layout_alignBottom="@id/btn_reset_password"/>
 
     </LinearLayout>
