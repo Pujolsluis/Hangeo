@@ -14,8 +14,8 @@
 
         <Button
             android:id="@+id/welcome_button_login"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
             android:layout_weight="1"
             style="?android:attr/borderlessButtonStyle"
             android:textColor="@color/colorWelcomeScreenFont"
@@ -26,8 +26,8 @@
 
         <Button
             android:id="@+id/button_signUp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
             android:layout_weight="1"
             style="?android:attr/borderlessButtonStyle"
             android:background="@color/colorPrimary"
