@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final int FORGOT_PASSWORD_ACTIVITY_RESPONSE = 1;
     private EditText inputEmail, inputPassword;
     private FirebaseAuth auth;
     private ProgressBar progressBar;
@@ -57,7 +58,8 @@ public class LoginActivity extends AppCompatActivity {
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, ForgotPassword.class));
+                Intent intent = new Intent(context, ForgotPassword.class);
+                startActivityForResult(intent, FORGOT_PASSWORD_ACTIVITY_RESPONSE);
             }
         });
 
@@ -91,13 +93,22 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                             }
                         } else {
-                            Intent intent = new Intent(context, MainActivity.class);
-                            startActivity(intent);
+                            Intent data = new Intent();
+                            setResult(RESULT_OK, data);
                             finish();
                         }
                     }
                 });
                 }
             });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == FORGOT_PASSWORD_ACTIVITY_RESPONSE){
+            if(resultCode == RESULT_OK){
+                Toast.makeText(context, "Type in your new password!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

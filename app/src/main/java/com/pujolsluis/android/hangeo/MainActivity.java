@@ -3,6 +3,7 @@ package com.pujolsluis.android.hangeo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -19,18 +20,27 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    Context context = this;
+    private Context context = this;
     private DrawerLayout mDrawerLayout;
+    private static final int WELCOME_SCREEN_RESPONSE = 1;
+    private FirebaseUser mUser;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -65,6 +75,31 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if(user != null){
+                    //user is signed in
+                    onSignedInInitialize(user);
+
+                }else{
+                    onSignoutCleanUp();
+                    //user is signed out
+                    Intent intent = new Intent(context, WelcomeScreenActivity.class);
+                    startActivityForResult(intent,WELCOME_SCREEN_RESPONSE);
+                }
+            }
+        };
+    }
+
+    private void onSignoutCleanUp() {
+        mUser = null;
+    }
+
+    private void onSignedInInitialize(FirebaseUser user) {
+        mUser = user;
+
     }
 
     @Override
@@ -97,6 +132,15 @@ public class MainActivity extends AppCompatActivity {
                                 Intent intent = new Intent(context, MapsActivity.class);
                                 mDrawerLayout.closeDrawer(GravityCompat.START);
                                 context.startActivity(intent);
+                                return true;
+                            case R.id.nav_sign_out:
+                                if(mFirebaseAuth != null){
+                                    //sign out
+                                    mFirebaseAuth.signOut();
+                                    mDrawerLayout.closeDrawer(GravityCompat.START);
+                                }
+                                return true;
+
                         }
                         return true;
                     }
@@ -130,6 +174,33 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitles.get(position);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == WELCOME_SCREEN_RESPONSE){
+            if(resultCode == RESULT_OK){
+                if(mFirebaseAuth != null){
+                    mUser = mFirebaseAuth.getCurrentUser();
+                }
+            }else{
+                this.finish();
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        if(mFirebaseAuth != null){
+            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        }
+        super.onStop();
     }
 }
 

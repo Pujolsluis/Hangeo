@@ -26,6 +26,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private Context context = this;
+    private static final int LOGIN_ACTIVITY_RESPONSE = 1;
+    private static final int FORGOT_PASSWORD_ACTIVITY_RESPONSE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +94,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void goToLogin() {
-            startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivityForResult(intent, LOGIN_ACTIVITY_RESPONSE);
     }
 
     private void goToForgotPassword() {
@@ -125,13 +128,29 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()){
-                            Toast.makeText(SignUpActivity.this, "Registered successfully!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(context, MainActivity.class);
-                            startActivity(intent);
+                            Toast.makeText(context, "Registered successfully!", Toast.LENGTH_SHORT).show();
+                            Intent dataToReturn = new Intent();
+                            setResult(RESULT_OK, dataToReturn);
+                            finish();
                         } else {
                             Toast.makeText(SignUpActivity.this, "Could not register, please try again!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == LOGIN_ACTIVITY_RESPONSE){
+            if(resultCode == RESULT_OK){
+                Intent dataToReturn = new Intent();
+                setResult(RESULT_OK, dataToReturn);
+                finish();
+            }
+        }else if(requestCode == FORGOT_PASSWORD_ACTIVITY_RESPONSE){
+            if(resultCode == RESULT_OK){
+                goToLogin();
+            }
+        }
     }
 }

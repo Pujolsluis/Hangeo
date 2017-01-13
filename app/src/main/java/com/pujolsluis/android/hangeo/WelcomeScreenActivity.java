@@ -1,9 +1,8 @@
 package com.pujolsluis.android.hangeo;
 
-import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
@@ -12,6 +11,8 @@ public class WelcomeScreenActivity extends AppCompatActivity {
 
     private Button bSignUp;
     private Button bLogin;
+    private static final int LOGIN_ACTIVITY_RESPONSE = 1;
+    private static final int SIGNUP_ACTIVITY_RESPONSE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,7 @@ public class WelcomeScreenActivity extends AppCompatActivity {
             public void onClick(View arg0) {
 
                 Intent intent = new Intent(WelcomeScreenActivity.this, SignUpActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, SIGNUP_ACTIVITY_RESPONSE);
             }
 
         });
@@ -37,8 +38,17 @@ public class WelcomeScreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 Intent intent = new Intent(WelcomeScreenActivity.this, LoginActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, LOGIN_ACTIVITY_RESPONSE);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK){
+            Intent dataToReturn = new Intent();
+            setResult(RESULT_OK, dataToReturn);
+            finish();
+        }
     }
 }
