@@ -21,5 +21,11 @@
         android:title="@string/menu_settings"
         app:showAsAction="never">
     </item>
+    <item
+        android:id="@+id/action_settings"
+        android:title="Settings"
+        app:showAsAction="never">
+
+    </item>
 
 </menu>

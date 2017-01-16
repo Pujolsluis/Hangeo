@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Context context = this;
     private DrawerLayout mDrawerLayout;
+    private FloatingActionButton mCreatePlanButton;
     private static final int WELCOME_SCREEN_RESPONSE = 1;
     private FirebaseUser mUser;
     private FirebaseAuth mFirebaseAuth;
@@ -63,17 +63,27 @@ public class MainActivity extends AppCompatActivity {
             setupViewPager(viewPager);
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        mCreatePlanButton = (FloatingActionButton) findViewById(R.id.fab_create_plan);
+
+        mCreatePlanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, PlanCreationActivity.class);
+                startActivity(intent);
+            }
+        });
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -203,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onStop();
     }
+
+
 }
 
 

@@ -63,6 +63,9 @@
 
         <activity android:name=".LoginActivity"
             android:parentActivityName=".WelcomeScreenActivity"/>
+
+        <activity android:name=".PlanCreationActivity"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>
