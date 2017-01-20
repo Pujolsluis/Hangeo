@@ -16,15 +16,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,8 +42,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int WELCOME_SCREEN_RESPONSE = 1;
     private static final int CREATE_PLAN_RESPONSE = 2;
     private FirebaseUser mUser;
+    private String mUserID;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mProfileDatabaseReference;
+    private String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mProfileDatabaseReference = mFirebaseDatabase.getReference().child("userProfiles");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -111,9 +125,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onSignedInInitialize(FirebaseUser user) {
-        if(user != null) {
-            mUser = user;
-        }
+        mUser = user;
+        mUserID = user.getUid();
+
     }
 
     @Override
@@ -194,12 +208,51 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == WELCOME_SCREEN_RESPONSE){
             if(resultCode == RESULT_OK){
-                if(mFirebaseAuth != null){
-                    mUser = mFirebaseAuth.getCurrentUser();
-                }
-            }else{
-                this.finish();
+                Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
+
+                mProfileDatabaseReference.child(mUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                // Get user information
+                                UserProfile tempProfile = dataSnapshot.getValue(UserProfile.class);
+                                if(tempProfile == null) {
+
+                                    tempProfile = new UserProfile();
+                                    tempProfile.setmFirstName(mUser.getDisplayName());
+
+
+                                    Map<String, Object> profileValues = tempProfile.toMap();
+
+                                    Map<String, Object> childUpdates = new HashMap<>();
+                                    childUpdates.put(mUserID, profileValues);
+                                    mProfileDatabaseReference.updateChildren(childUpdates);
+
+//                                // Create new comment object
+//                                String commentText = mCommentField.getText().toString();
+//                                Comment comment = new Comment(uid, authorName, commentText);
+//
+//                                // Push the comment, it will appear in the list
+//                                mCommentsReference.push().setValue(comment);
+//
+//                                // Clear the field
+//                                mCommentField.setText(null);
+                                }else{
+                                    Toast.makeText(context, "Profile is already created", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.e(LOG_TAG, databaseError.toString());
+                            }
+                        });
+
+            }else if(resultCode == RESULT_CANCELED){
+                Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
+                finish();
             }
+
         }else if(requestCode == CREATE_PLAN_RESPONSE){
             if(resultCode == RESULT_OK){
                 Toast.makeText(context, "Your Plan was created", Toast.LENGTH_SHORT).show();

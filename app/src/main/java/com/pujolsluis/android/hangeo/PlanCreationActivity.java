@@ -19,7 +19,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Oficina on 16/01/2017.
@@ -40,6 +48,9 @@ public class PlanCreationActivity extends AppCompatActivity {
     private Calendar calendar;
     private String format = "";
     private String mUserID;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mPlanDatabaseReference;
+    private DatabaseReference mProfileDatabaseReference;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +58,11 @@ public class PlanCreationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_plan);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+
+        mUserID = (String) getIntent().getExtras().get("mUserID");
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mPlanDatabaseReference = mFirebaseDatabase.getReference().child("plans");
+        mProfileDatabaseReference = mFirebaseDatabase.getReference().child("userProfiles");
 
 //        mFinishActivityButton = (Button) findViewById(R.id.finish_activity_button);
 //
@@ -69,7 +85,6 @@ public class PlanCreationActivity extends AppCompatActivity {
 
         Button saveButton = (Button) findViewById(R.id.create_plan_button);
 
-        mUserID = (String) getIntent().getExtras().get("mUserID");
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,6 +173,9 @@ public class PlanCreationActivity extends AppCompatActivity {
 
             Log.d(LOG_TAG, "Plan Name: " + planName + "\nPlan Description: " + planDescription + "\nPlan Time: " + planTime
                             + "\nPlan Time Human Readible: " + tempCalendar.getTime().toString() + "\nUserId: " + mUserID);
+
+            updateDatabase();
+
             setResult(RESULT_OK);
             finish();
 
@@ -179,6 +197,46 @@ public class PlanCreationActivity extends AppCompatActivity {
                 inputLayout.setError("You need to pick a time");
 
         }
+    }
+
+    private void updateDatabase() {
+
+        Calendar tempCalendar = Calendar.getInstance();
+        tempCalendar.set(mYear, mMonth, mDay, mHour, mMinutes);
+
+        PlanTemp newPlan = new PlanTemp(mUserID, mPlanName.getText().toString(), tempCalendar.getTimeInMillis());
+        newPlan.setmDescription(String.valueOf(mPlanDescription.getText()));
+        newPlan.addPlanMembers(mUserID);
+
+        DatabaseReference dbRef = mPlanDatabaseReference.push();
+        final String planKEY = dbRef.getKey();
+        dbRef.setValue(newPlan);
+
+        mProfileDatabaseReference.child(mUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Get user information
+                        UserProfile userProfile = dataSnapshot.getValue(UserProfile.class);
+                        if(userProfile != null) {
+                            userProfile.addPlan(planKEY);
+
+                            Map<String, Object> profileUpdatedValues = userProfile.toMap();
+
+                            Map<String, Object> childUpdates = new HashMap<>();
+
+                            childUpdates.put(mUserID, profileUpdatedValues);
+                            mProfileDatabaseReference.updateChildren(childUpdates);
+                        }else{
+                            Log.d(LOG_TAG, mUserID);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(LOG_TAG, databaseError.toString());
+                    }
+                });
     }
 
 }
