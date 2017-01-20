@@ -19,22 +19,157 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize"
-            android:padding="16dp">
+            >
 
+                <ImageView
+                    android:id="@+id/create_plan_imageView"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:foregroundGravity="center_horizontal"
+                    android:layout_marginTop="52dp"
+                    android:src="@drawable/ic_event_black_48dp"/>
+
+                <TextView
+                    android:id="@+id/create_plan_textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create Plan"
+                    android:textAllCaps="true"
+                    android:gravity="center_horizontal"
+                    android:layout_below="@id/create_plan_imageView"
+                    android:layout_marginTop="8dp"
+                    android:textSize="20dp"
+                    android:textColor="@color/colorPrimaryDark"/>
+
+                <LinearLayout
+                    android:id="@+id/form_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/create_plan_textView"
+                    android:orientation="vertical"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_marginTop="16dp">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/create_plan_name_inputLayout"
+                        >
+                        <EditText
+                            android:id="@+id/create_plan_name_textView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Plan Name"
+                            android:inputType="textCapSentences"
+                            android:maxLines="1"
+                            />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <EditText
+                            android:id="@+id/create_plan_description_textView"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:hint="Description"
+                            android:maxLength="140"
+                            android:gravity="start"
+                            android:textAlignment="textStart"
+                            />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="16dp">
+
+                        <LinearLayout
+                            android:id="@+id/select_date_layout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingRight="4dp"
+                            android:layout_weight="1">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Date:"
+                                android:textSize="16sp"
+                                android:paddingRight="8dp"/>
+
+                            <android.support.design.widget.TextInputLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/create_plan_pick_date_inputLayout"
+                                >
+                                <EditText
+                                    android:id="@+id/pick_date"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Select Date"
+                                    android:textAlignment="center"
+                                    android:textSize="16sp"
+                                    />
+                            </android.support.design.widget.TextInputLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/select_time_layout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingRight="4dp"
+                            android:layout_weight="1"
+                            >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Time:"
+                                android:textSize="16sp"
+                                android:paddingRight="8dp"/>
+
+                            <android.support.design.widget.TextInputLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/create_plan_pick_time_inputLayout"
+                                >
+                            <EditText
+                                android:id="@+id/pick_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Select Time"
+                                android:textAlignment="center"
+                                android:textSize="16sp"
+                                />
+                            </android.support.design.widget.TextInputLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
 
             <Button
-                android:id="@+id/finish_activity_button"
+                android:id="@+id/create_plan_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Finish Activity"
-                />
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="16dp"
+                android:text="CREATE"
+                android:background="@color/colorAccent"/>
+
 
         </RelativeLayout>
     </android.support.design.widget.CoordinatorLayout>
