@@ -39,6 +39,7 @@ public class PlanCreationActivity extends AppCompatActivity {
     private int mYear, mMonth, mDay, mHour, mMinutes;
     private Calendar calendar;
     private String format = "";
+    private String mUserID;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +68,8 @@ public class PlanCreationActivity extends AppCompatActivity {
         mPlanDescription = (EditText) findViewById(R.id.create_plan_description_textView);
 
         Button saveButton = (Button) findViewById(R.id.create_plan_button);
+
+        mUserID = (String) getIntent().getExtras().get("mUserID");
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,7 +156,10 @@ public class PlanCreationActivity extends AppCompatActivity {
             String planName = String.valueOf(mPlanName.getText());
             String planDescription = String.valueOf(mPlanDescription.getText());
 
-            Log.d(LOG_TAG, "Plan Name: " + planName + "\nPlan Description: " + planDescription + "\nPlan Time: " + planTime);
+            Log.d(LOG_TAG, "Plan Name: " + planName + "\nPlan Description: " + planDescription + "\nPlan Time: " + planTime
+                            + "\nPlan Time Human Readible: " + tempCalendar.getTime().toString() + "\nUserId: " + mUserID);
+            setResult(RESULT_OK);
+            finish();
 
         }else{
 

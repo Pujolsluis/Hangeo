@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private FloatingActionButton mCreatePlanButton;
     private static final int WELCOME_SCREEN_RESPONSE = 1;
+    private static final int CREATE_PLAN_RESPONSE = 2;
     private FirebaseUser mUser;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -81,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, PlanCreationActivity.class);
-                startActivity(intent);
+                intent.putExtra("mUserID", mUser.getUid());
+                startActivityForResult(intent, CREATE_PLAN_RESPONSE);
             }
         });
 
@@ -196,6 +199,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }else{
                 this.finish();
+            }
+        }else if(requestCode == CREATE_PLAN_RESPONSE){
+            if(resultCode == RESULT_OK){
+                Toast.makeText(context, "Your Plan was created", Toast.LENGTH_SHORT).show();
+            }else{
+
             }
         }
     }
