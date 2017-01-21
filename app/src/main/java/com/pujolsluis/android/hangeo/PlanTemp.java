@@ -14,13 +14,15 @@ import java.util.Map;
 
 @IgnoreExtraProperties
 public class PlanTemp {
+    private String mPlanKey = "";
     private String mAuthorID = "";
     private String mTitle = "";
     private String mDescription = " ";
-    private String mImageBannerResource = " ";
+    private int mImageBannerResource = 0;
     private String mType = " ";
     private Long mCreationDate = (long) 0;
     private List<String> mPlanMembers;
+    private List<String> mPlanLocations;
 
     public PlanTemp() {
         // Default constructor required for calls to DataSnapshot.getValue(Post.class)
@@ -65,11 +67,11 @@ public class PlanTemp {
         this.mTitle = mTitle;
     }
 
-    public String getmImageBannerResource() {
+    public int getmImageBannerResource() {
         return mImageBannerResource;
     }
 
-    public void setmImageBannerResource(String mImageBannerResource) {
+    public void setmImageBannerResource(int mImageBannerResource) {
         this.mImageBannerResource = mImageBannerResource;
     }
 
@@ -96,6 +98,22 @@ public class PlanTemp {
     public void removePlanMembers(String oldMember){
         if(!mPlanMembers.isEmpty())
             mPlanMembers.remove(oldMember);
+    }
+
+    public List<String> getmPlanLocations() {
+        return mPlanLocations;
+    }
+
+    public void setmPlanLocations(List<String> mPlanLocations) {
+        this.mPlanLocations = mPlanLocations;
+    }
+
+    public String getmPlanKey() {
+        return mPlanKey;
+    }
+
+    public void setmPlanKey(String mPlanKey) {
+        this.mPlanKey = mPlanKey;
     }
 
     @Exclude

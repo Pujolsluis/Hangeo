@@ -21,13 +21,13 @@ public class UserProfile {
     private String mCountry = "";
     private Long mFriendsSize = (long) 0;
     private Long mPlansSize = (long) 0;
-    private List<String> mPlans;
+    private List<PlanTemp> mPlans;
     private List<String> mFriends;
     private Long mBirthdate = (long) 0;
     private String mEmail = "";
 
     public UserProfile(){
-        mPlans = new ArrayList<String>();
+        mPlans = new ArrayList<PlanTemp>();
         mFriends = new ArrayList<String>();
 
     }
@@ -88,11 +88,11 @@ public class UserProfile {
         this.mPlansSize = mPlansSize;
     }
 
-    public List<String> getmPlans() {
+    public List<PlanTemp> getmPlans() {
         return mPlans;
     }
 
-    public void setmPlans(List<String> mPlans) {
+    public void setmPlans(List<PlanTemp> mPlans) {
         this.mPlans = mPlans;
     }
 
@@ -137,7 +137,7 @@ public class UserProfile {
     }
 
     @Exclude
-    public void addPlan(String newPlan){
+    public void addPlan(PlanTemp newPlan){
         mPlans.add(newPlan);
         mPlansSize++;
     }

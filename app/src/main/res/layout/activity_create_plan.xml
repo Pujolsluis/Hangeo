@@ -156,8 +156,12 @@
                                 />
                             </android.support.design.widget.TextInputLayout>
                         </LinearLayout>
-
                     </LinearLayout>
+                    <Spinner
+                        android:id="@+id/create_plan_chooseImage_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                    </Spinner>
                 </LinearLayout>
 
             <Button

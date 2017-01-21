@@ -14,9 +14,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.google.firebase.database.DataSnapshot;
@@ -33,7 +36,7 @@ import java.util.Map;
  * Created by Oficina on 16/01/2017.
  */
 
-public class PlanCreationActivity extends AppCompatActivity {
+public class PlanCreationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private static final String LOG_TAG = PlanCreationActivity.class.getSimpleName();
 
@@ -44,6 +47,7 @@ public class PlanCreationActivity extends AppCompatActivity {
     private EditText mTimePickerEditText;
     private EditText mPlanName;
     private EditText mPlanDescription;
+    private int mImageResourceForPlan;
     private int mYear, mMonth, mDay, mHour, mMinutes;
     private Calendar calendar;
     private String format = "";
@@ -74,6 +78,19 @@ public class PlanCreationActivity extends AppCompatActivity {
 //        });
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        Spinner spinner = (Spinner) findViewById(R.id.create_plan_chooseImage_spinner);
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.planets_array, android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
         mDatePickerEditText = (EditText) findViewById(R.id.pick_date);
         mTimePickerEditText = (EditText) findViewById(R.id.pick_time);
@@ -204,12 +221,15 @@ public class PlanCreationActivity extends AppCompatActivity {
         Calendar tempCalendar = Calendar.getInstance();
         tempCalendar.set(mYear, mMonth, mDay, mHour, mMinutes);
 
-        PlanTemp newPlan = new PlanTemp(mUserID, mPlanName.getText().toString(), tempCalendar.getTimeInMillis());
+        final PlanTemp newPlan = new PlanTemp(mUserID, mPlanName.getText().toString(), tempCalendar.getTimeInMillis());
         newPlan.setmDescription(String.valueOf(mPlanDescription.getText()));
+        newPlan.setmImageBannerResource(mImageResourceForPlan);
         newPlan.addPlanMembers(mUserID);
 
         DatabaseReference dbRef = mPlanDatabaseReference.push();
         final String planKEY = dbRef.getKey();
+
+        newPlan.setmPlanKey(planKEY);
         dbRef.setValue(newPlan);
 
         mProfileDatabaseReference.child(mUserID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -218,7 +238,8 @@ public class PlanCreationActivity extends AppCompatActivity {
                         // Get user information
                         UserProfile userProfile = dataSnapshot.getValue(UserProfile.class);
                         if(userProfile != null) {
-                            userProfile.addPlan(planKEY);
+
+                            userProfile.addPlan(newPlan);
 
                             Map<String, Object> profileUpdatedValues = userProfile.toMap();
 
@@ -239,4 +260,29 @@ public class PlanCreationActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        switch (i){
+            default:
+            case 0:
+                mImageResourceForPlan = R.drawable.plan_example_1;
+            case 1:
+                mImageResourceForPlan = R.drawable.plan_example_2;
+            case 2:
+                mImageResourceForPlan = R.drawable.plan_example_3;
+            case 3:
+                mImageResourceForPlan = R.drawable.plan_example_4;
+            case 4:
+                mImageResourceForPlan = R.drawable.plan_example_5;
+            case 5:
+                mImageResourceForPlan = R.drawable.example_1;
+            case 6:
+                mImageResourceForPlan = R.drawable.example_3;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
 }

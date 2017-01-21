@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
-                android:id="@+id/avatar"
+                android:id="@+id/plan_background_header"
                 android:layout_width="match_parent"
                 android:layout_height="116dp"
                 android:paddingBottom="16dp"
@@ -38,7 +38,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="24dp"/>
                 <TextView
-                    android:id="@android:id/text1"
+                    android:id="@+id/plan_title_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -52,16 +52,16 @@
                     android:layout_height="@dimen/list_loc_icon_size"
                     android:src="@drawable/ic_plan_list_loc"
                     android:layout_toRightOf="@id/plan_card_user_avatar"
-                    android:layout_below="@android:id/text1"
+                    android:layout_below="@id/plan_title_textView"
                     android:paddingLeft="16dp"/>
                 <TextView
-                    android:id="@+id/textView_plan_description"
+                    android:id="@+id/plan_locations_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     style="@style/CardContent_SubTitle"
                     android:layout_toRightOf="@id/list_loc_icon"
-                    android:layout_below="@android:id/text1"/>
+                    android:layout_below="@id/plan_title_textView"/>
             </RelativeLayout>
         </LinearLayout>
 

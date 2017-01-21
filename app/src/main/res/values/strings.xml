@@ -52,4 +52,17 @@
     <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
     <!--END OF  Welcome Screen, Login, Sign Up and Forgot Password Strings-->
 
+
+  <!--START OF SPINNER options for create plan screen-->
+  <string-array name="planets_array">
+    <item>Image 1</item>
+    <item>Image 2</item>
+    <item>Image 3</item>
+    <item>Image 4</item>
+    <item>Image 5</item>
+    <item>Image 6</item>
+    <item>Image 7</item>
+  </string-array>
+  <!--END OF SPINNER options for create plan screen-->
+
 </resources>
