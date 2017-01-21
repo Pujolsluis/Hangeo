@@ -266,18 +266,25 @@ public class PlanCreationActivity extends AppCompatActivity implements AdapterVi
             default:
             case 0:
                 mImageResourceForPlan = R.drawable.plan_example_1;
+                return;
             case 1:
                 mImageResourceForPlan = R.drawable.plan_example_2;
+                return;
             case 2:
                 mImageResourceForPlan = R.drawable.plan_example_3;
+                return;
             case 3:
                 mImageResourceForPlan = R.drawable.plan_example_4;
+                return;
             case 4:
                 mImageResourceForPlan = R.drawable.plan_example_5;
+                return;
             case 5:
                 mImageResourceForPlan = R.drawable.example_1;
+                return;
             case 6:
                 mImageResourceForPlan = R.drawable.example_3;
+                return;
         }
     }
 

@@ -62,6 +62,8 @@ public class PlanListFragment extends Fragment {
                         else locationsInPlan += ", " + planLocations.get(i);
 
                     }
+                }else{
+                    locationsInPlan = "Select your destinations";
                 }
 
                 planViewHolder.setmPlanLocations(locationsInPlan);
