@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,14 +31,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private Context context = this;
     private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private TextView mNavDrawerHeaderFirstNameLastName;
+    private UserProfile mUserProfile;
     private FloatingActionButton mCreatePlanButton;
     private static final int WELCOME_SCREEN_RESPONSE = 1;
     private static final int CREATE_PLAN_RESPONSE = 2;
@@ -69,26 +71,20 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
+
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        if (mNavigationView != null) {
+            setupDrawerContent(mNavigationView);
         }
 
-        navigationView.setCheckedItem(R.id.nav_plans);
+        mNavigationView.setCheckedItem(R.id.nav_plans);
+
+        mNavDrawerHeaderFirstNameLastName = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_firstName_lastName);
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
         if (mViewPager != null) {
             setupViewPager(mViewPager);
         }
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
 
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
@@ -111,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 if(user != null){
                     //user is signed in
                     onSignedInInitialize(user);
+                    setupDrawerContent(mNavigationView);
 
                 }else{
                     onSignoutCleanUp();
@@ -120,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
     }
 
     private void onSignoutCleanUp() {
@@ -129,6 +127,12 @@ public class MainActivity extends AppCompatActivity {
     private void onSignedInInitialize(FirebaseUser user) {
         mUser = user;
         mUserID = user.getUid();
+        if(mUserProfile != null){
+            Log.d(LOG_TAG, "User Profile is no longer null :D" + "\n" + mUserProfile.getmFirstName() + "Really nigga?");
+            mNavDrawerHeaderFirstNameLastName.setText(mUserProfile.getmFirstName() + " " + mUserProfile.getmLastName());
+
+
+        }
 
     }
 
@@ -208,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if(requestCode == WELCOME_SCREEN_RESPONSE){
             if(resultCode == RESULT_OK){
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
@@ -222,26 +227,8 @@ public class MainActivity extends AppCompatActivity {
                                 UserProfile tempProfile = dataSnapshot.getValue(UserProfile.class);
                                 if(tempProfile == null) {
 
-                                    tempProfile = new UserProfile();
-                                    tempProfile.setmFirstName(mUser.getDisplayName());
-
-
-                                    Map<String, Object> profileValues = tempProfile.toMap();
-
-                                    Map<String, Object> childUpdates = new HashMap<>();
-                                    childUpdates.put(mUserID, profileValues);
-                                    mProfileDatabaseReference.updateChildren(childUpdates);
-
-//                                // Create new comment object
-//                                String commentText = mCommentField.getText().toString();
-//                                Comment comment = new Comment(uid, authorName, commentText);
-//
-//                                // Push the comment, it will appear in the list
-//                                mCommentsReference.push().setValue(comment);
-//
-//                                // Clear the field
-//                                mCommentField.setText(null);
                                 }else{
+                                    mUserProfile = tempProfile;
                                     Toast.makeText(context, "Profile is already created", Toast.LENGTH_SHORT).show();
                                 }
 

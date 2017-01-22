@@ -1,6 +1,8 @@
 package com.pujolsluis.android.hangeo;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -38,6 +40,7 @@ public class PlanListFragment extends Fragment {
     private DatabaseReference mUserPlansReference;
     private DatabaseReference mDatabasePlansReference;
     private String mUserID;
+    private PlanTemp mPlanTemp;
 
     @Nullable
     @Override
@@ -63,11 +66,11 @@ public class PlanListFragment extends Fragment {
                 mDatabasePlansReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        PlanTemp planTemp = dataSnapshot.getValue(PlanTemp.class);
+                        mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
 
-                        planViewHolder.setmPlanTitle(planTemp.getmTitle());
-                        planViewHolder.setmPlanImageHeaderImageView(planTemp.getmImageBannerResource());
-                        List<String> planLocations = planTemp.getmPlanLocations();
+                        planViewHolder.setmPlanTitle(mPlanTemp.getmTitle());
+                        planViewHolder.setmPlanImageHeaderImageView(mPlanTemp.getmImageBannerResource());
+                        List<String> planLocations = mPlanTemp.getmPlanLocations();
                         String locationsInPlan = "";
                         if(planLocations != null) {
                             for (int i = 0; i < planLocations.size(); i++) {
@@ -81,6 +84,17 @@ public class PlanListFragment extends Fragment {
                         }
 
                         planViewHolder.setmPlanLocations(locationsInPlan);
+
+                        planViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Context context = v.getContext();
+                                Intent intent = new Intent(context, PlanDetailsActivity.class);
+                                intent.putExtra(PlanDetailsActivity.EXTRA_NAME, planViewHolder.mPlanTitle.getText().toString());
+
+                                context.startActivity(intent);
+                            }
+                        });
                     }
 
                     @Override
@@ -99,13 +113,16 @@ public class PlanListFragment extends Fragment {
     }
 
 
+
     public static class PlanHolder extends RecyclerView.ViewHolder {
+        private final View mView;
         private final TextView mPlanTitle;
         private final ImageView mPlanImageHeaderImageView;
         private final TextView mPlanLocations;
 
         public PlanHolder(View itemView) {
             super(itemView);
+            mView = itemView;
             mPlanTitle = (TextView) itemView.findViewById(R.id.plan_title_textView);
             mPlanLocations = (TextView) itemView.findViewById(R.id.plan_locations_textView);
             mPlanImageHeaderImageView = (ImageView) itemView.findViewById(R.id.plan_background_header);

@@ -14,8 +14,8 @@ import java.util.Map;
 
 @IgnoreExtraProperties
 public class UserProfile {
-    private String mFirstName = "";
-    private String mLastName = "";
+    private String mFirstName = "FirstName";
+    private String mLastName = "LastName";
     private String mImageResource = "";
     private String mSex = "";
     private String mCountry = "";
