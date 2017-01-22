@@ -239,7 +239,7 @@ public class PlanCreationActivity extends AppCompatActivity implements AdapterVi
                         UserProfile userProfile = dataSnapshot.getValue(UserProfile.class);
                         if(userProfile != null) {
 
-                            userProfile.addPlan(newPlan);
+                            userProfile.addPlan(planKEY);
 
                             Map<String, Object> profileUpdatedValues = userProfile.toMap();
 

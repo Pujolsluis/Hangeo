@@ -21,13 +21,13 @@ public class UserProfile {
     private String mCountry = "";
     private Long mFriendsSize = (long) 0;
     private Long mPlansSize = (long) 0;
-    private List<PlanTemp> mPlans;
+    private Map<String, Boolean> mPlans;
     private List<String> mFriends;
     private Long mBirthdate = (long) 0;
     private String mEmail = "";
 
     public UserProfile(){
-        mPlans = new ArrayList<PlanTemp>();
+        mPlans = new HashMap<>();
         mFriends = new ArrayList<String>();
 
     }
@@ -88,11 +88,11 @@ public class UserProfile {
         this.mPlansSize = mPlansSize;
     }
 
-    public List<PlanTemp> getmPlans() {
+    public Map<String, Boolean> getmPlans() {
         return mPlans;
     }
 
-    public void setmPlans(List<PlanTemp> mPlans) {
+    public void setmPlans(Map<String, Boolean> mPlans) {
         this.mPlans = mPlans;
     }
 
@@ -137,8 +137,8 @@ public class UserProfile {
     }
 
     @Exclude
-    public void addPlan(PlanTemp newPlan){
-        mPlans.add(newPlan);
+    public void addPlan(String newPlan){
+        mPlans.put(newPlan, true);
         mPlansSize++;
     }
 
