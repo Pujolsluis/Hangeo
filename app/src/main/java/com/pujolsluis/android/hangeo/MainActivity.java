@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mProfileDatabaseReference;
     private String LOG_TAG = MainActivity.class.getSimpleName();
+    private ViewPager mViewPager;
+    private TabLayout mTabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +76,9 @@ public class MainActivity extends AppCompatActivity {
 
         navigationView.setCheckedItem(R.id.nav_plans);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        if (viewPager != null) {
-            setupViewPager(viewPager);
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        if (mViewPager != null) {
+            setupViewPager(mViewPager);
         }
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -88,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
 
         mCreatePlanButton = (FloatingActionButton) findViewById(R.id.fab_create_plan);
 
@@ -209,6 +211,9 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == WELCOME_SCREEN_RESPONSE){
             if(resultCode == RESULT_OK){
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
+
+                mUserID = mFirebaseAuth.getCurrentUser().getUid();
+                setupViewPager(mViewPager);
 
                 mProfileDatabaseReference.child(mUserID).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override

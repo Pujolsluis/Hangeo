@@ -25,6 +25,7 @@ public class UserProfile {
     private List<String> mFriends;
     private Long mBirthdate = (long) 0;
     private String mEmail = "";
+    private Boolean mIsAdmin = false;
 
     public UserProfile(){
         mPlans = new HashMap<>();
@@ -120,7 +121,13 @@ public class UserProfile {
         this.mFriends = mFriends;
     }
 
+    public Boolean getmIsAdmin() {
+        return mIsAdmin;
+    }
 
+    public void setmIsAdmin(Boolean mIsAdmin) {
+        this.mIsAdmin = mIsAdmin;
+    }
 
     @Exclude
     public void addFriend(String newFriend){
@@ -165,6 +172,7 @@ public class UserProfile {
         result.put("mFriends", mFriends);
         result.put("mBirthdate", mBirthdate);
         result.put("mEmail", mEmail);
+        result.put("mIsAdmin", mIsAdmin);
 
 
         return result;

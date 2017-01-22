@@ -3,7 +3,6 @@ package com.pujolsluis.android.hangeo;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ public class PlanTemp {
     private int mImageBannerResource = 0;
     private String mType = " ";
     private Long mCreationDate = (long) 0;
-    private List<String> mPlanMembers;
+    private Map<String, Boolean> mPlanMembers;
     private List<String> mPlanLocations;
 
     public PlanTemp() {
@@ -32,7 +31,7 @@ public class PlanTemp {
         mAuthorID = author;
         mTitle = title;
         mCreationDate = creationDate;
-        mPlanMembers = new ArrayList<>();
+        mPlanMembers = new HashMap<>();
     }
 
     public String getmAuthorID() {
@@ -83,16 +82,16 @@ public class PlanTemp {
         this.mType = mType;
     }
 
-    public List<String> getmPlanMembers() {
+    public Map<String, Boolean> getmPlanMembers() {
         return mPlanMembers;
     }
 
-    public void setmPlanMembers(List<String> mPlanMembers) {
+    public void setmPlanMembers(Map<String, Boolean> mPlanMembers) {
         this.mPlanMembers = mPlanMembers;
     }
 
     public void addPlanMembers(String newMember){
-        mPlanMembers.add(newMember);
+        mPlanMembers.put(newMember, true);
     }
 
     public void removePlanMembers(String oldMember){
@@ -125,6 +124,8 @@ public class PlanTemp {
         result.put("mImageBannerResource", mImageBannerResource);
         result.put("mType", mType);
         result.put("mCreationDate", mCreationDate);
+        result.put("mPlanMembers", mPlanMembers);
+        result.put("mPlanLocations", mPlanLocations);
 
         return result;
     }
