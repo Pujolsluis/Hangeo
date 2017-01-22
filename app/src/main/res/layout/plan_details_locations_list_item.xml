@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ImageView
+        android:id="@+id/plan_details_locations_list_item_ImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_plan_list_loc"
+        />
+    <TextView
+        android:id="@+id/plan_details_locations_list_item_TextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/plan_details_locations_list_item_ImageView"
+        android:gravity="center_vertical"
+        android:padding="4dp"
+        tools:text="Seven Dip's"
+        android:textSize="16sp"
+        android:textColor="@color/colorPrimary"/>
+
+
+</RelativeLayout>

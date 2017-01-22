@@ -32,6 +32,16 @@
                 android:fitsSystemWindows="true"
                 app:layout_collapseMode="parallax" />
 
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:layout_marginBottom="52dp"
+                android:layout_gravity="end|bottom"
+                android:scaleX="0.9"
+                android:scaleY="0.9"
+                />
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -93,8 +103,94 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/plan_description_ipsum" />
+                        android:text="@string/plan_description_ipsum"
+                        android:maxLines="6"/>
 
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="16dp">
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_weight="2">
+
+                            <TextView
+                                android:id="@+id/plan_details_locations_titleHeader"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentLeft="true"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/plan_details_locations_title"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+                            <ListView
+                                android:layout_below="@id/plan_details_locations_titleHeader"
+                                android:id="@+id/plan_details_locations_list_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="fill_parent"
+                                android:paddingTop="8dp"
+                                android:paddingLeft="8dp"
+                                android:footerDividersEnabled="false"
+                                android:headerDividersEnabled="false"
+                                />
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:id="@+id/plan_details_plan_time_TitleHeader"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentLeft="true"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/plan_details_time_title"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+                            <TextView
+                                android:id="@+id/plan_details_time_value"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/plan_details_plan_time_TitleHeader"
+                                android:text="@string/plan_details_time_value"
+                                android:gravity="end"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:paddingRight="4dp"
+                                android:paddingTop="8dp"
+                                />
+
+                            <TextView
+                                android:id="@+id/plan_details_plan_estimated_cost_TitleHeader"
+                                android:layout_marginTop="16dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/plan_details_estimated_cost_title"
+                                android:layout_below="@id/plan_details_time_value"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+                            <TextView
+                                android:id="@+id/plan_details_estimated_cost_value"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/plan_details_plan_estimated_cost_TitleHeader"
+                                android:text="@string/plan_details_estimated_cost_value"
+                                android:gravity="end"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:paddingRight="4dp"
+                                android:paddingTop="8dp"
+                                />
+
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>

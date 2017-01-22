@@ -4,11 +4,23 @@
     <string name="splash_screen_description">Hangeo under developement splash screen</string>
 
     <!--PujolsLuis Strings-->
+  <!--START OF PLAN DETAILS LAYOUT Strings-->
   <string name="plan_description_ipsum">Jarlsberg lancashire edam. Dolcelatte hard cheese brie st. agur blue
     cheese caerphilly bavarian bergkase cheese and biscuits mascarpone. Cheeseburger swiss bavarian
     bergkase cream cheese fromage frais cheesy feet port-salut airedale. St. agur blue cheese rubber
     cheese caerphilly cheddar cheesecake cream cheese manchego lancashire. Roquefort squirty cheese
     the big cheese.</string>
+    <string name="plan_details_locations_title">Locations</string>
+    <string name="plan_details_time_title">Time</string>
+    <string name="plan_details_time_value">12:00 AM</string>
+    <string name="plan_details_estimated_cost_title">Estimated Cost</string>
+    <string name="plan_details_estimated_cost_value">$$$</string>
+
+  <!--END OF PLAN DETAILS LAYOUT Strings-->
+
+
+
+
     <string name="checkin">Checkin</string>
 
     <string name="menu_settings">Settings</string>
