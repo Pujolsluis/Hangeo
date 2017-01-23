@@ -50,6 +50,10 @@
     <string name="btn_link_to_register">You\'re not a member yet? Get registered now</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
     <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
-    <!--END OF  Welcome Screen, Login, Sign Up and Forgot Password Strings-->
+  <string name="invitation_title">Invitation to Hangeo</string>
+  <string name="invitation_message">You have been invited to Hangeo! Accept it to go to the app</string>
+  <string name="invitation_deep_link">https://ve9ar.app.goo.gl/b2OT</string>
+  <string name="invitation_cta">Invitation CTA</string>
+  <!--END OF  Welcome Screen, Login, Sign Up and Forgot Password Strings-->
 
 </resources>
