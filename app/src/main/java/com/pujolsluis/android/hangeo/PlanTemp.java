@@ -14,7 +14,7 @@ import java.util.Map;
 
 @IgnoreExtraProperties
 public class PlanTemp {
-    private String mPlanKey = "";
+    private String mPlanKey = " ";
     private String mAuthorID = "";
     private String mTitle = "";
     private String mDescription = " ";
@@ -168,6 +168,7 @@ public class PlanTemp {
         result.put("mPlanLocationsLatLng", mPlanLocationsLatLng);
         result.put("mOverviewPolyline", mOverviewPolyline);
         result.put("mPlanLocationsNames", mPlanLocationsNames);
+        result.put("mPlanKey", mPlanKey);
 
         return result;
     }

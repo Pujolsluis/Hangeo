@@ -2,6 +2,7 @@ package com.pujolsluis.android.hangeo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -22,17 +23,24 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.PolyUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +52,7 @@ import static com.pujolsluis.android.hangeo.R.id.plan_details_map;
 
 public class PlanDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private Context context = this;
     public static final String EXTRA_NAME = "plan_name";
     public static final String EXTRA_PLAN_KEY = "plan_key";
     public static final String EXTRA_PLAN_IMAGE_RESOURCE = "plan_imageResource";
@@ -71,6 +80,8 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     private DatabaseReference mPlanMembersReference;
     private DatabaseReference mUserProfilesReference;
     private DatabaseReference mPlanDatabaseReference;
+    private DatabaseReference mPlanSpecificReference;
+    private Polyline mPolyLine;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,11 +96,101 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         mPlanMembersReference = mFirebaseDatabase.getReference().child("plans").child(mPlanKey).child("mPlanMembers");
         mUserProfilesReference = mFirebaseDatabase.getReference().child("userProfiles");
         mPlanDatabaseReference = mFirebaseDatabase.getReference().child("plans");
+        mPlanSpecificReference = mFirebaseDatabase.getReference().child("plans").child(mPlanKey);
 
         mPlanDescription = (TextView) findViewById(R.id.plan_details_description_textView);
         mPlanTimeValue = (TextView) findViewById(R.id.plan_details_time_value);
         mPlanEstimatedCostValue = (TextView) findViewById(R.id.plan_details_estimated_cost_value);
 
+        mPlanSpecificReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        List<String> locations = new ArrayList<String>();
+
+                        PlanTemp mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
+
+                        mPlanDescription.setText(mPlanTemp.getmDescription());
+                        Calendar tempCalendar = Calendar.getInstance();
+                        tempCalendar.setTimeInMillis(mPlanTemp.getmCreationDate());
+
+                        mPlanImageResource = mPlanTemp.getmImageBannerResource();
+                        loadBackdrop();
+
+                        SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM h:mm a");
+                        String dateString = formatter.format(mPlanTemp.getmCreationDate());
+
+                        mPlanTimeValue.setText(dateString);
+                        mPlanEstimatedCostValue.setText(mPlanTemp.getmEstimatedCost());
+                        List<String> planLocations = mPlanTemp.getmPlanLocationsNames();
+
+                        mGoogleMap.clear();
+                        //Initializing the Polyline
+                        mPolyLine = mGoogleMap.addPolyline(new PolylineOptions());
+                        mPolyLine.setColor(Color.BLUE);
+
+
+                        String locationsInPlan = "";
+                        List<LatLng> locationPoints = new ArrayList<LatLng>();
+                        if(planLocations != null) {
+                            locations = planLocations;
+                            for (int i = 0; i < planLocations.size(); i++) {
+                                LatLng tempPoint = new LatLng(mPlanTemp.getmPlanLocationsLatLng().get(i).getLat(),mPlanTemp.getmPlanLocationsLatLng().get(i).getLng());
+                                locationPoints.add(tempPoint);
+                                MarkerOptions tempMarker = new MarkerOptions().position(tempPoint).title(mPlanTemp.getmPlanLocationsNames().get(i));
+                                mGoogleMap.addMarker(tempMarker);
+                            }
+                        }else{
+                            locations.add("No destinations");
+                        }
+
+                        updateMapBounds(locationPoints);
+                        List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
+                        mPolyLine.setPoints(polyLinePoints);
+
+
+                        //Code for Locations List View
+                        LocationsAdapter locationsAdapter = new LocationsAdapter(context, locations);
+
+                        ListView listView = (ListView) findViewById(R.id.plan_details_locations_list_view);
+                        listView.setAdapter(locationsAdapter);
+
+                        listView.setDivider(null);
+                        setListViewHeightBasedOnItems(listView);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(LOG_TAG, databaseError.toString());
+                    }
+                });
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,16 +213,14 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
             }
         });
 
-        List<String> locations = new ArrayList<String>();
-        locations.add("Seven Dip's");
-        locations.add("Shot's Bar");
-        locations.add("Jet Set");
-        locations.add("Bowling Center");
-        locations.add("Boca Tabu Concert");
+
 
         mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
+                List<String> locations = new ArrayList<String>();
+
                 PlanTemp mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
 
                 mPlanDescription.setText(mPlanTemp.getmDescription());
@@ -136,38 +235,41 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
                 mPlanTimeValue.setText(dateString);
                 mPlanEstimatedCostValue.setText(mPlanTemp.getmEstimatedCost());
-                List<String> planLocations = mPlanTemp.getmPlanLocations();
+                List<String> planLocations = mPlanTemp.getmPlanLocationsNames();
                 String locationsInPlan = "";
                 if(planLocations != null) {
                     for (int i = 0; i < planLocations.size(); i++) {
 
-                        if (i == 0) locationsInPlan += planLocations.get(i);
-                        else locationsInPlan += ", " + planLocations.get(i);
+                        locations = planLocations;
+
+
 
                     }
                 }else{
-
+                    locations.add("No destinations");
                 }
+
+                //Code for Locations List View
+                LocationsAdapter locationsAdapter = new LocationsAdapter(context, locations);
+
+                ListView listView = (ListView) findViewById(R.id.plan_details_locations_list_view);
+                listView.setAdapter(locationsAdapter);
+
+                listView.setDivider(null);
+                setListViewHeightBasedOnItems(listView);
 
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.e(LOG_TAG, databaseError.toString());
             }
         });
 
 
 
 
-        //Code for Locations List View
-        LocationsAdapter locationsAdapter = new LocationsAdapter(this, locations);
 
-        ListView listView = (ListView) findViewById(R.id.plan_details_locations_list_view);
-        listView.setAdapter(locationsAdapter);
-
-        listView.setDivider(null);
-        setListViewHeightBasedOnItems(listView);
 
 
         //Members Recycler view
@@ -211,7 +313,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        Log.e(LOG_TAG, databaseError.toString());
                     }
                 });
 
@@ -264,8 +366,10 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
                 .bearing(0)
                 .build();
         flyTo(cameraStartPosition);
-        //Setting the correct Padding for the map ui
-        mGoogleMap.setPadding(16, 278, 16, 16);
+
+        //Initializing the Polyline
+        mPolyLine = mGoogleMap.addPolyline(new PolylineOptions());
+        mPolyLine.setColor(Color.BLUE);
 
     }
 
@@ -383,7 +487,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
                 mPlanTimeValue.setText(dateString);
                 mPlanEstimatedCostValue.setText(mPlanTemp.getmEstimatedCost());
-                List<String> planLocations = mPlanTemp.getmPlanLocations();
+                List<String> planLocations = mPlanTemp.getmPlanLocationsNames();
                 String locationsInPlan = "";
                 if(planLocations != null) {
                     for (int i = 0; i < planLocations.size(); i++) {
@@ -400,7 +504,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.e(LOG_TAG, databaseError.toString());
             }
         });
     }
@@ -417,21 +521,21 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         }
     }
 
-    //Updating the map bounds to move camera so it includes all new locations in the map camera
-//   private void updateMapBounds() {
-//        LatLngBounds.Builder mMapLatLngBoundsBuilder = new LatLngBounds.Builder();
-//
-//        //Include points to consider for map Bounds
-//        for (int i = 0; i < mPolyLineSelectedPointList.size(); i++) {
-//            mMapLatLngBoundsBuilder.include(mPolyLineSelectedPointList.get(i));
-//        }
-//
-//        //Create new Camera Update to indicate where to move camera
-//        CameraUpdate newMapBounds =
-//                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 240);
-//
-//        //Update Camera to new Bounds
-//        mGoogleMap.moveCamera(newMapBounds);
-//    }
+//    Updating the map bounds to move camera so it includes all new locations in the map camera
+   private void updateMapBounds(List<LatLng> pointsList) {
+        LatLngBounds.Builder mMapLatLngBoundsBuilder = new LatLngBounds.Builder();
+
+        //Include points to consider for map Bounds
+        for (int i = 0; i < pointsList.size(); i++) {
+            mMapLatLngBoundsBuilder.include(pointsList.get(i));
+        }
+
+        //Create new Camera Update to indicate where to move camera
+        CameraUpdate newMapBounds =
+                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 120);
+
+        //Update Camera to new Bounds
+        mGoogleMap.moveCamera(newMapBounds);
+    }
 
 }

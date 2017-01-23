@@ -41,23 +41,30 @@ public class PlanListFragment extends Fragment {
     private DatabaseReference mDatabasePlansReference;
     private String mUserID;
     private PlanTemp mPlanTemp;
+    private RecyclerView mRecyclerView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_plan_list, container, false);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        RecyclerView mRecyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_plan_list, container, false);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mRecyclerView.getContext()));
         //setupRecyclerView(recyclerView);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mUserID = mFirebaseAuth.getCurrentUser().getUid();
+        if(mFirebaseAuth != null)
+            mUserID = mFirebaseAuth.getCurrentUser().getUid();
 
         mUserPlansReference = mFirebaseDatabase.getReference().child("userProfiles").child(mUserID).child("mPlans");
         mDatabasePlansReference = mFirebaseDatabase.getReference().child("plans");
 
         mAdapter = new FirebaseRecyclerAdapter<Boolean, PlanHolder>(Boolean.class, R.layout.list_item , PlanHolder.class, mUserPlansReference) {
+            @Override
+            protected void onDataChanged() {
+                super.onDataChanged();
+            }
+
             @Override
             public void populateViewHolder(final PlanHolder planViewHolder, Boolean planItem, int position) {
                 Log.e(LOG_TAG, "Ref Position: " + position + " Value: " + key);
@@ -71,7 +78,7 @@ public class PlanListFragment extends Fragment {
                         planViewHolder.setmPlanTitle(mPlanTemp.getmTitle());
                         planViewHolder.setmPlanImageHeaderImageView(mPlanTemp.getmImageBannerResource());
                         planViewHolder.setmPlanKey(mPlanTemp.getmPlanKey());
-                        List<String> planLocations = mPlanTemp.getmPlanLocations();
+                        List<String> planLocations = mPlanTemp.getmPlanLocationsNames();
                         String locationsInPlan = "";
                         if(planLocations != null) {
                             for (int i = 0; i < planLocations.size(); i++) {
@@ -106,13 +113,15 @@ public class PlanListFragment extends Fragment {
                     }
                 });
 
+
+
             }
 
         };
 
-        recyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
 
-        return recyclerView;
+        return mRecyclerView;
     }
 
 
@@ -159,5 +168,19 @@ public class PlanListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAdapter.cleanup();
+    }
 }

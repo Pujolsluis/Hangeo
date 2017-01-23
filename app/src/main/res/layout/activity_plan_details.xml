@@ -81,7 +81,7 @@
                 android:id="@+id/plan_details_map"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="124dp"
+                android:layout_height="172dp"
                 tools:context="com.pujolsluis.android.hangeo.PlanDetailsActivity"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
