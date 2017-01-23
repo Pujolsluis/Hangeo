@@ -99,14 +99,15 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(cheeseName);
 
-        loadBackdrop();
 
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.plan_details_action_button);
 
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent()
+                Context context = view.getContext();
+                Intent intent = new Intent(context, MapsActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -117,7 +118,6 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         locations.add("Bowling Center");
         locations.add("Boca Tabu Concert");
 
-
         mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -126,6 +126,9 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
                 mPlanDescription.setText(mPlanTemp.getmDescription());
                 Calendar tempCalendar = Calendar.getInstance();
                 tempCalendar.setTimeInMillis(mPlanTemp.getmCreationDate());
+
+                mPlanImageResource = mPlanTemp.getmImageBannerResource();
+                loadBackdrop();
 
                 SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM h:mm a");
                 String dateString = formatter.format(mPlanTemp.getmCreationDate());
@@ -359,4 +362,45 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                PlanTemp mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
+
+                mPlanDescription.setText(mPlanTemp.getmDescription());
+                Calendar tempCalendar = Calendar.getInstance();
+                tempCalendar.setTimeInMillis(mPlanTemp.getmCreationDate());
+
+                mPlanImageResource = mPlanTemp.getmImageBannerResource();
+                loadBackdrop();
+
+                SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM h:mm a");
+                String dateString = formatter.format(mPlanTemp.getmCreationDate());
+
+                mPlanTimeValue.setText(dateString);
+                mPlanEstimatedCostValue.setText(mPlanTemp.getmEstimatedCost());
+                List<String> planLocations = mPlanTemp.getmPlanLocations();
+                String locationsInPlan = "";
+                if(planLocations != null) {
+                    for (int i = 0; i < planLocations.size(); i++) {
+
+                        if (i == 0) locationsInPlan += planLocations.get(i);
+                        else locationsInPlan += ", " + planLocations.get(i);
+
+                    }
+                }else{
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 }

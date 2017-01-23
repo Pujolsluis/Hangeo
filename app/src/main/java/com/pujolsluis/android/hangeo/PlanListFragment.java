@@ -70,6 +70,7 @@ public class PlanListFragment extends Fragment {
 
                         planViewHolder.setmPlanTitle(mPlanTemp.getmTitle());
                         planViewHolder.setmPlanImageHeaderImageView(mPlanTemp.getmImageBannerResource());
+                        planViewHolder.setmPlanKey(mPlanTemp.getmPlanKey());
                         List<String> planLocations = mPlanTemp.getmPlanLocations();
                         String locationsInPlan = "";
                         if(planLocations != null) {
@@ -91,7 +92,7 @@ public class PlanListFragment extends Fragment {
                                 Context context = v.getContext();
                                 Intent intent = new Intent(context, PlanDetailsActivity.class);
                                 intent.putExtra(PlanDetailsActivity.EXTRA_NAME, planViewHolder.mPlanTitle.getText().toString());
-                                intent.putExtra(PlanDetailsActivity.EXTRA_PLAN_KEY, mPlanTemp.getmPlanKey());
+                                intent.putExtra(PlanDetailsActivity.EXTRA_PLAN_KEY, planViewHolder.getmPlanKEY());
                                 intent.putExtra(PlanDetailsActivity.EXTRA_PLAN_IMAGE_RESOURCE, mPlanTemp.getmImageBannerResource());
 
                                 context.startActivity(intent);
@@ -121,6 +122,7 @@ public class PlanListFragment extends Fragment {
         private final TextView mPlanTitle;
         private final ImageView mPlanImageHeaderImageView;
         private final TextView mPlanLocations;
+        private String mPlanKEY;
 
         public PlanHolder(View itemView) {
             super(itemView);
@@ -128,6 +130,7 @@ public class PlanListFragment extends Fragment {
             mPlanTitle = (TextView) itemView.findViewById(R.id.plan_title_textView);
             mPlanLocations = (TextView) itemView.findViewById(R.id.plan_locations_textView);
             mPlanImageHeaderImageView = (ImageView) itemView.findViewById(R.id.plan_background_header);
+            mPlanKEY = "x";
         }
 
 
@@ -145,6 +148,14 @@ public class PlanListFragment extends Fragment {
                     .load(imageResource)
                     .fitCenter()
                     .into(mPlanImageHeaderImageView);
+        }
+
+        public void setmPlanKey(String key){
+            mPlanKEY = key;
+        }
+
+        public String getmPlanKEY() {
+            return mPlanKEY;
         }
     }
 
