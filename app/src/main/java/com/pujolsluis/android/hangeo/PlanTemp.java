@@ -22,6 +22,7 @@ public class PlanTemp {
     private Long mCreationDate = (long) 0;
     private Map<String, Boolean> mPlanMembers;
     private List<String> mPlanLocations;
+    private String mEstimatedCost = "$$";
 
     public PlanTemp() {
         // Default constructor required for calls to DataSnapshot.getValue(Post.class)
@@ -115,6 +116,14 @@ public class PlanTemp {
         this.mPlanKey = mPlanKey;
     }
 
+    public String getmEstimatedCost() {
+        return mEstimatedCost;
+    }
+
+    public void setmEstimatedCost(String mEstimatedCost) {
+        this.mEstimatedCost = mEstimatedCost;
+    }
+
     @Exclude
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
@@ -126,6 +135,7 @@ public class PlanTemp {
         result.put("mCreationDate", mCreationDate);
         result.put("mPlanMembers", mPlanMembers);
         result.put("mPlanLocations", mPlanLocations);
+        result.put("mEstimatedCost", mEstimatedCost);
 
         return result;
     }

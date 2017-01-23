@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +34,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static android.R.attr.key;
@@ -43,8 +46,15 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
     public static final String EXTRA_NAME = "plan_name";
     public static final String EXTRA_PLAN_KEY = "plan_key";
+    public static final String EXTRA_PLAN_IMAGE_RESOURCE = "plan_imageResource";
     public static final String LOG_TAG = PlanDetailsActivity.class.getSimpleName();
+    private int mPlanImageResource;
+    private FloatingActionButton mFloatingActionButton;
     private String mPlanKey;
+    private TextView mPlanDescription;
+    private TextView mPlanTimeValue;
+    private TextView mPlanEstimatedCostValue;
+
     // Google Map Object
     private GoogleMap mGoogleMap;
     //Map Ready Indicator
@@ -59,6 +69,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mPlanMembersReference;
     private DatabaseReference mUserProfilesReference;
+    private DatabaseReference mPlanDatabaseReference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,17 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         Intent intent = getIntent();
         final String cheeseName = intent.getStringExtra(EXTRA_NAME);
         mPlanKey = intent.getStringExtra(EXTRA_PLAN_KEY);
+        mPlanImageResource = intent.getIntExtra(EXTRA_PLAN_IMAGE_RESOURCE, 0);
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mPlanMembersReference = mFirebaseDatabase.getReference().child("plans").child(mPlanKey).child("mPlanMembers");
+        mUserProfilesReference = mFirebaseDatabase.getReference().child("userProfiles");
+        mPlanDatabaseReference = mFirebaseDatabase.getReference().child("plans");
+
+        mPlanDescription = (TextView) findViewById(R.id.plan_details_description_textView);
+        mPlanTimeValue = (TextView) findViewById(R.id.plan_details_time_value);
+        mPlanEstimatedCostValue = (TextView) findViewById(R.id.plan_details_estimated_cost_value);
+
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,12 +101,58 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
         loadBackdrop();
 
+        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.plan_details_action_button);
+
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent intent = new Intent()
+            }
+        });
+
         List<String> locations = new ArrayList<String>();
         locations.add("Seven Dip's");
         locations.add("Shot's Bar");
         locations.add("Jet Set");
         locations.add("Bowling Center");
         locations.add("Boca Tabu Concert");
+
+
+        mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                PlanTemp mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
+
+                mPlanDescription.setText(mPlanTemp.getmDescription());
+                Calendar tempCalendar = Calendar.getInstance();
+                tempCalendar.setTimeInMillis(mPlanTemp.getmCreationDate());
+
+                SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM h:mm a");
+                String dateString = formatter.format(mPlanTemp.getmCreationDate());
+
+                mPlanTimeValue.setText(dateString);
+                mPlanEstimatedCostValue.setText(mPlanTemp.getmEstimatedCost());
+                List<String> planLocations = mPlanTemp.getmPlanLocations();
+                String locationsInPlan = "";
+                if(planLocations != null) {
+                    for (int i = 0; i < planLocations.size(); i++) {
+
+                        if (i == 0) locationsInPlan += planLocations.get(i);
+                        else locationsInPlan += ", " + planLocations.get(i);
+
+                    }
+                }else{
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
 
 
@@ -109,9 +177,6 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mPlanMembersReference = mFirebaseDatabase.getReference().child("plans").child(mPlanKey).child("mPlanMembers");
-        mUserProfilesReference = mFirebaseDatabase.getReference().child("userProfiles");
 
         // specify an adapter (see also next example)
 
@@ -169,7 +234,10 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
     private void loadBackdrop() {
         final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-        Glide.with(this).load(Plan.getRandomCheeseDrawable()).centerCrop().into(imageView);
+        Glide.with(this)
+                .load(mPlanImageResource)
+                .centerCrop()
+                .into(imageView);
     }
 
     @Override
@@ -181,6 +249,8 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+
+        mGoogleMap.getUiSettings().setScrollGesturesEnabled(false);
 
         // Add a marker in Sydney and move the camera
         LatLng sevendips = new LatLng(18.487438, -69.961872);
@@ -251,6 +321,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
             Glide.with(mPlanMemberImageResource.getContext())
                     .load(imageResource)
                     .into(mPlanMemberImageResource);
+
         }
     }
 
