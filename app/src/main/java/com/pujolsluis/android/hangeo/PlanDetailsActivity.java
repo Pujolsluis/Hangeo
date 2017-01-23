@@ -79,7 +79,6 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         Intent intent = getIntent();
         final String cheeseName = intent.getStringExtra(EXTRA_NAME);
         mPlanKey = intent.getStringExtra(EXTRA_PLAN_KEY);
-        mPlanImageResource = intent.getIntExtra(EXTRA_PLAN_IMAGE_RESOURCE, 0);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mPlanMembersReference = mFirebaseDatabase.getReference().child("plans").child(mPlanKey).child("mPlanMembers");

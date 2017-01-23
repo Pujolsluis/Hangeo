@@ -93,7 +93,7 @@ public class PlanListFragment extends Fragment {
                                 Intent intent = new Intent(context, PlanDetailsActivity.class);
                                 intent.putExtra(PlanDetailsActivity.EXTRA_NAME, planViewHolder.mPlanTitle.getText().toString());
                                 intent.putExtra(PlanDetailsActivity.EXTRA_PLAN_KEY, planViewHolder.getmPlanKEY());
-                                intent.putExtra(PlanDetailsActivity.EXTRA_PLAN_IMAGE_RESOURCE, mPlanTemp.getmImageBannerResource());
+
 
                                 context.startActivity(intent);
                             }
