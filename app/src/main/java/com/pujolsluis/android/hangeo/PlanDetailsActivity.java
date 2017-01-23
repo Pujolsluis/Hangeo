@@ -66,6 +66,8 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     private TextView mPlanDescription;
     private TextView mPlanTimeValue;
     private TextView mPlanEstimatedCostValue;
+    private CollapsingToolbarLayout collapsingToolbar;
+    private String mPlanName;
 
     // Google Map Object
     private GoogleMap mGoogleMap;
@@ -91,7 +93,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         setContentView(R.layout.activity_plan_details);
 
         Intent intent = getIntent();
-        final String planName = intent.getStringExtra(EXTRA_NAME);
+        mPlanName = intent.getStringExtra(EXTRA_NAME);
         mPlanKey = intent.getStringExtra(EXTRA_PLAN_KEY);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -103,6 +105,14 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         mPlanDescription = (TextView) findViewById(R.id.plan_details_description_textView);
         mPlanTimeValue = (TextView) findViewById(R.id.plan_details_time_value);
         mPlanEstimatedCostValue = (TextView) findViewById(R.id.plan_details_estimated_cost_value);
+
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        collapsingToolbar =  (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(mPlanName);
 
         mPlanSpecificReference.addChildEventListener(new ChildEventListener() {
             @Override
@@ -232,6 +242,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
                         listView.setDivider(null);
                         setListViewHeightBasedOnItems(listView);
 
+                        collapsingToolbar.setTitle(mPlanName);
                     }
 
                     @Override
@@ -257,15 +268,6 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
             }
         });
-
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(planName);
-
 
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.plan_details_action_button);
 
