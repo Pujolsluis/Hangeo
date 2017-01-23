@@ -91,6 +91,7 @@ public class PlanListFragment extends Fragment {
                                 Context context = v.getContext();
                                 Intent intent = new Intent(context, PlanDetailsActivity.class);
                                 intent.putExtra(PlanDetailsActivity.EXTRA_NAME, planViewHolder.mPlanTitle.getText().toString());
+                                intent.putExtra(PlanDetailsActivity.EXTRA_PLAN_KEY, mPlanTemp.getmPlanKey());
 
                                 context.startActivity(intent);
                             }

@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -17,21 +20,31 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.R.attr.key;
 import static com.pujolsluis.android.hangeo.R.id.plan_details_map;
 
 public class PlanDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     public static final String EXTRA_NAME = "plan_name";
+    public static final String EXTRA_PLAN_KEY = "plan_key";
+    public static final String LOG_TAG = PlanDetailsActivity.class.getSimpleName();
+    private String mPlanKey;
     // Google Map Object
     private GoogleMap mGoogleMap;
     //Map Ready Indicator
@@ -39,6 +52,13 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     //View to get the main activity layout and use it in the permission method
     private View mLayout;
 
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mPlanMembersReference;
+    private DatabaseReference mUserProfilesReference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +67,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
         Intent intent = getIntent();
         final String cheeseName = intent.getStringExtra(EXTRA_NAME);
+        mPlanKey = intent.getStringExtra(EXTRA_PLAN_KEY);
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -65,6 +86,8 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         locations.add("Bowling Center");
         locations.add("Boca Tabu Concert");
 
+
+
         //Code for Locations List View
         LocationsAdapter locationsAdapter = new LocationsAdapter(this, locations);
 
@@ -73,6 +96,64 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
         listView.setDivider(null);
         setListViewHeightBasedOnItems(listView);
+
+
+        //Members Recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.plan_details_members_recycler_view);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mPlanMembersReference = mFirebaseDatabase.getReference().child("plans").child(mPlanKey).child("mPlanMembers");
+        mUserProfilesReference = mFirebaseDatabase.getReference().child("userProfiles");
+
+        // specify an adapter (see also next example)
+
+        mAdapter = new FirebaseRecyclerAdapter<Boolean, PlanDetailsActivity.PlanMembersHolder>(Boolean.class, R.layout.plan_details_members_list_item , PlanDetailsActivity.PlanMembersHolder.class, mPlanMembersReference) {
+            @Override
+            public void populateViewHolder(final PlanDetailsActivity.PlanMembersHolder planViewHolder, Boolean planItem, int position) {
+                Log.e(LOG_TAG, "Ref Position: " + position + " Value: " + key);
+                String key = this.getRef(position).getKey();
+
+                mUserProfilesReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        UserProfile mUserProfile = dataSnapshot.getValue(UserProfile.class);
+
+                        planViewHolder.setmPlanMemberFirstNameLastName(mUserProfile.getmFirstName() + " " + mUserProfile.getmLastName());
+                        planViewHolder.setmPlanMemberImageResource(mUserProfile.getmImageResource());
+
+                        planViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+//                                Context context = v.getContext();
+//                                Intent intent = new Intent(context, PlanDetailsActivity.class);
+//                                intent.putExtra(PlanDetailsActivity.EXTRA_NAME, planViewHolder.mPlanTitle.getText().toString());
+//
+//                                context.startActivity(intent);
+                            }
+                        });
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+
+        };
+
+
+
+        mRecyclerView.setAdapter(mAdapter);
+
 
         //CODE FOR MAP STARTS HERE
 
@@ -141,6 +222,35 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
             locationName.setText(location);
             // Return the completed view to render on screen
             return convertView;
+        }
+    }
+
+    public static class PlanMembersHolder extends RecyclerView.ViewHolder {
+        private final View mView;
+        private final ImageView mPlanMemberImageResource;
+        private final TextView mPlanMemberFirstNameLastName;
+
+        public PlanMembersHolder(View itemView) {
+            super(itemView);
+            mView = itemView;
+            mPlanMemberFirstNameLastName = (TextView) mView.findViewById(R.id.plan_details_members_list_item_textView);
+            mPlanMemberImageResource = (ImageView) mView.findViewById(R.id.plan_details_members_list_item_imageView);
+        }
+
+
+        public void setmPlanMemberFirstNameLastName(String name) {
+            mPlanMemberFirstNameLastName.setText(name);
+        }
+
+        public void setmPlanMemberImageResource(String imageResource){
+//            mPlanMemberImageResource.setImageResource(imageResource);
+//            Glide.with(mPlanMemberImageResource.getContext())
+//                    .load(imageResource)
+//                    .fitCenter()
+//                    .into(mPlanMemberImageResource);
+            Glide.with(mPlanMemberImageResource.getContext())
+                    .load(imageResource)
+                    .into(mPlanMemberImageResource);
         }
     }
 
