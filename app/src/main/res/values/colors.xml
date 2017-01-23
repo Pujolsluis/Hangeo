@@ -6,4 +6,5 @@
     <color name="colorTextInFrontOfPrimary">#FFFFFF</color>
     <color name="colorLightPrimaryColor">#FFFFFF</color>
     <color name="colorWelcomeScreenFont">#FAFAFA</color>
+    <color name="colorTest">#B2EBF2</color>
 </resources>

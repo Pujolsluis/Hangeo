@@ -41,14 +41,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:backgroundTintMode="src_over"
         android:layout_above="@id/WelcomeLayoutBottomButtons">
 
         <ImageView
             android:id="@+id/ImageView_WelcomeScreen"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/hangeo_app_land"
-            android:scaleType="centerCrop"/>
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:src="@drawable/logo_hangeo"/>
     </LinearLayout>
 
 </RelativeLayout>
