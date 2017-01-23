@@ -48,11 +48,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.PolyUtil;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.pujolsluis.android.hangeo.R.id.map;
 
@@ -107,6 +114,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Directions API Base Request URL
     private static final String DIRECTIONSAPI_REQUEST_URL = "https://maps.googleapis.com/maps/api/directions/json";
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mPlansFirebaseReference;
 
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
@@ -169,6 +179,65 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Get a reference to the LoaderManager, in order to interact with loaders.
         loaderManager = getLoaderManager();
+
+        Intent intent = getIntent();
+        final String mPlanKey = intent.getStringExtra(PlanDetailsActivity.EXTRA_PLAN_KEY);
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mPlansFirebaseReference = mFirebaseDatabase.getReference().child("plans");
+
+        Button saveButton = (Button) findViewById(R.id.activity_map_save_button);
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mPlansFirebaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Get user information
+                        PlanTemp planTemp = dataSnapshot.getValue(PlanTemp.class);
+
+                        List<CustomLatLngPoints> planSelectedPointList = new ArrayList<CustomLatLngPoints>();
+                        List<String> planSelectedLocationsNames = new ArrayList<String>();
+                        for(int i=0; i<mPolyLineSelectedPointList.size(); i++){
+                            CustomLatLngPoints newPoint = new CustomLatLngPoints();
+                            LatLng tempLatLng = mPolyLineSelectedPointList.get(i);
+                            newPoint.setLat(tempLatLng.latitude);
+                            newPoint.setLng(tempLatLng.longitude);
+                            planSelectedPointList.add(newPoint);
+
+                            String tempLocationName = mSelectedMarkerslist.get(i).getTitle();
+                            planSelectedLocationsNames.add(tempLocationName);
+                        }
+                        planTemp.setmPlanLocationsLatLng(planSelectedPointList);
+                        planTemp.setmPlanLocationsNames(planSelectedLocationsNames);
+
+                        String planPolyline = PolyUtil.encode(mPolyLine.getPoints());
+
+                        planTemp.setmOverviewPolyline(planPolyline);
+
+
+                        Map<String, Object> profileUpdatedValues = planTemp.toMap();
+
+                        Map<String, Object> childUpdates = new HashMap<>();
+
+                        childUpdates.put(mPlanKey, profileUpdatedValues);
+                        mPlansFirebaseReference.updateChildren(childUpdates);
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(LOG_TAG, databaseError.toString());
+                    }
+                });
+
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
 
 
     }

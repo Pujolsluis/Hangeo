@@ -3,6 +3,7 @@ package com.pujolsluis.android.hangeo;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,9 @@ public class PlanTemp {
     private Map<String, Boolean> mPlanMembers;
     private List<String> mPlanLocations;
     private String mEstimatedCost = "$$";
+    private List<CustomLatLngPoints> mPlanLocationsLatLng;
+    private List<String> mPlanLocationsNames;
+    private String mOverviewPolyline;
 
     public PlanTemp() {
         // Default constructor required for calls to DataSnapshot.getValue(Post.class)
@@ -33,6 +37,7 @@ public class PlanTemp {
         mTitle = title;
         mCreationDate = creationDate;
         mPlanMembers = new HashMap<>();
+        mPlanLocationsLatLng = new ArrayList<CustomLatLngPoints>();
     }
 
     public String getmAuthorID() {
@@ -124,6 +129,30 @@ public class PlanTemp {
         this.mEstimatedCost = mEstimatedCost;
     }
 
+    public List<CustomLatLngPoints> getmPlanLocationsLatLng() {
+        return mPlanLocationsLatLng;
+    }
+
+    public void setmPlanLocationsLatLng(List<CustomLatLngPoints> mPlanLocationsLatLng) {
+        this.mPlanLocationsLatLng = mPlanLocationsLatLng;
+    }
+
+    public String getmOverviewPolyline() {
+        return mOverviewPolyline;
+    }
+
+    public void setmOverviewPolyline(String mOverviewPolyline) {
+        this.mOverviewPolyline = mOverviewPolyline;
+    }
+
+    public List<String> getmPlanLocationsNames() {
+        return mPlanLocationsNames;
+    }
+
+    public void setmPlanLocationsNames(List<String> mPlanLocationsNames) {
+        this.mPlanLocationsNames = mPlanLocationsNames;
+    }
+
     @Exclude
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
@@ -136,6 +165,9 @@ public class PlanTemp {
         result.put("mPlanMembers", mPlanMembers);
         result.put("mPlanLocations", mPlanLocations);
         result.put("mEstimatedCost", mEstimatedCost);
+        result.put("mPlanLocationsLatLng", mPlanLocationsLatLng);
+        result.put("mOverviewPolyline", mOverviewPolyline);
+        result.put("mPlanLocationsNames", mPlanLocationsNames);
 
         return result;
     }

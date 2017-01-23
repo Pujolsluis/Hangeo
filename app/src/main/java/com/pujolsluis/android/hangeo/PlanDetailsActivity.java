@@ -47,6 +47,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     public static final String EXTRA_NAME = "plan_name";
     public static final String EXTRA_PLAN_KEY = "plan_key";
     public static final String EXTRA_PLAN_IMAGE_RESOURCE = "plan_imageResource";
+    public static final int MAP_SELECT_LOCATIONS = 1;
     public static final String LOG_TAG = PlanDetailsActivity.class.getSimpleName();
     private int mPlanImageResource;
     private FloatingActionButton mFloatingActionButton;
@@ -106,7 +107,8 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
             public void onClick(View view) {
                 Context context = view.getContext();
                 Intent intent = new Intent(context, MapsActivity.class);
-                startActivity(intent);
+                intent.putExtra(EXTRA_PLAN_KEY, mPlanKey);
+                startActivityForResult(intent, MAP_SELECT_LOCATIONS);
             }
         });
 
@@ -402,4 +404,34 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == MAP_SELECT_LOCATIONS){
+            if(resultCode == RESULT_OK){
+                    Log.d(LOG_TAG, "Im ok! :3");
+            }else{
+
+            }
+        }
+    }
+
+    //Updating the map bounds to move camera so it includes all new locations in the map camera
+//   private void updateMapBounds() {
+//        LatLngBounds.Builder mMapLatLngBoundsBuilder = new LatLngBounds.Builder();
+//
+//        //Include points to consider for map Bounds
+//        for (int i = 0; i < mPolyLineSelectedPointList.size(); i++) {
+//            mMapLatLngBoundsBuilder.include(mPolyLineSelectedPointList.get(i));
+//        }
+//
+//        //Create new Camera Update to indicate where to move camera
+//        CameraUpdate newMapBounds =
+//                CameraUpdateFactory.newLatLngBounds(mMapLatLngBoundsBuilder.build(), 240);
+//
+//        //Update Camera to new Bounds
+//        mGoogleMap.moveCamera(newMapBounds);
+//    }
+
 }

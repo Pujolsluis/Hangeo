@@ -60,10 +60,11 @@
                         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
                         <android.support.v7.widget.CardView
+                            android:id="@+id/activity_map_search_cardView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_marginBottom="4dp"
                             android:layout_marginRight="16dp"
                             android:layout_marginLeft="16dp">
                             <LinearLayout
@@ -86,6 +87,17 @@
                                     android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"/>
                             </LinearLayout>
                         </android.support.v7.widget.CardView>
+
+                    <Button
+                        android:id="@+id/activity_map_save_button"
+                        android:backgroundTint="@color/colorAccent"
+                        android:layout_marginEnd="64dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_add"
+                        android:layout_below="@id/activity_map_search_cardView"
+                        android:text="@string/button_save_map"
+                        android:layout_alignParentEnd="true"/>
 
                 </RelativeLayout>
 
