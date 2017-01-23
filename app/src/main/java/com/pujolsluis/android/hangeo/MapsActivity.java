@@ -117,6 +117,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mPlansFirebaseReference;
+    private String mPlanKey;
 
     //Method to allow multidexing in our app, making it compatible with android versions <4.4
     @Override
@@ -181,7 +182,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         loaderManager = getLoaderManager();
 
         Intent intent = getIntent();
-        final String mPlanKey = intent.getStringExtra(PlanDetailsActivity.EXTRA_PLAN_KEY);
+        mPlanKey = intent.getStringExtra(PlanDetailsActivity.EXTRA_PLAN_KEY);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mPlansFirebaseReference = mFirebaseDatabase.getReference().child("plans");
@@ -271,6 +272,58 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mGoogleMap.setMyLocationEnabled(true);
         } else requestLocationPermission();
+
+
+        mPlansFirebaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                List<String> locations = new ArrayList<String>();
+
+                PlanTemp mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
+
+
+
+                List<String> planLocations = mPlanTemp.getmPlanLocationsNames();
+
+                mGoogleMap.clear();
+                //Initializing the Polyline
+                mPolyLine = mGoogleMap.addPolyline(new PolylineOptions());
+                mPolyLine.setColor(Color.BLUE);
+
+
+                String locationsInPlan = "";
+                List<LatLng> locationPoints = new ArrayList<LatLng>();
+                if(planLocations != null) {
+                    locations = planLocations;
+                    for (int i = 0; i < planLocations.size(); i++) {
+                        LatLng tempPoint = new LatLng(mPlanTemp.getmPlanLocationsLatLng().get(i).getLat(),mPlanTemp.getmPlanLocationsLatLng().get(i).getLng());
+                        locationPoints.add(tempPoint);
+                        mPolyLineSelectedPointList.add(tempPoint);
+                        MarkerOptions tempMarker = new MarkerOptions().position(tempPoint).title(mPlanTemp.getmPlanLocationsNames().get(i));
+                        Marker tempMarkerObject = mGoogleMap.addMarker(tempMarker);
+                        mSelectedMarkerslist.add(tempMarkerObject);
+                        mSelectedMarkersMap.put(tempMarkerObject, i);
+
+                    }
+                }else{
+                    locations.add("No destinations");
+                }
+
+                updateMapBounds();
+                List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
+                mPolyLine.setPoints(polyLinePoints);
+
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(LOG_TAG, databaseError.toString());
+            }
+        });
+
 
     }
 
@@ -465,7 +518,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onMarkerClick(Marker marker) {
 //                marker.remove();
                 marker.showInfoWindow();
-                updatePanelHeader(mLastMarker);
+                updatePanelHeader(marker);
                 updatePanelHeaderButton(marker);
                 mLastMarker = marker;
                 return true;
