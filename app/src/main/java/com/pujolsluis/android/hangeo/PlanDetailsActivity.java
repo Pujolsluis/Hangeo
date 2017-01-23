@@ -105,6 +105,70 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         mPlanSpecificReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        List<String> locations = new ArrayList<String>();
+
+                        PlanTemp mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
+
+                        mPlanDescription.setText(mPlanTemp.getmDescription());
+                        Calendar tempCalendar = Calendar.getInstance();
+                        tempCalendar.setTimeInMillis(mPlanTemp.getmCreationDate());
+
+                        mPlanImageResource = mPlanTemp.getmImageBannerResource();
+                        loadBackdrop();
+
+                        SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM h:mm a");
+                        String dateString = formatter.format(mPlanTemp.getmCreationDate());
+
+                        mPlanTimeValue.setText(dateString);
+                        mPlanEstimatedCostValue.setText(mPlanTemp.getmEstimatedCost());
+                        List<String> planLocations = mPlanTemp.getmPlanLocationsNames();
+
+                        mGoogleMap.clear();
+                        //Initializing the Polyline
+                        mPolyLine = mGoogleMap.addPolyline(new PolylineOptions());
+                        mPolyLine.setColor(Color.BLUE);
+
+
+                        String locationsInPlan = "";
+                        List<LatLng> locationPoints = new ArrayList<LatLng>();
+                        if(planLocations != null) {
+                            locations = planLocations;
+                            for (int i = 0; i < planLocations.size(); i++) {
+                                LatLng tempPoint = new LatLng(mPlanTemp.getmPlanLocationsLatLng().get(i).getLat(),mPlanTemp.getmPlanLocationsLatLng().get(i).getLng());
+                                locationPoints.add(tempPoint);
+                                MarkerOptions tempMarker = new MarkerOptions().position(tempPoint).title(mPlanTemp.getmPlanLocationsNames().get(i));
+                                mGoogleMap.addMarker(tempMarker);
+                            }
+                        }else{
+                            locations.add("No destinations");
+                        }
+
+                        updateMapBounds(locationPoints);
+                        List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
+                        mPolyLine.setPoints(polyLinePoints);
+
+
+                        //Code for Locations List View
+                        LocationsAdapter locationsAdapter = new LocationsAdapter(context, locations);
+
+                        ListView listView = (ListView) findViewById(R.id.plan_details_locations_list_view);
+                        listView.setAdapter(locationsAdapter);
+
+                        listView.setDivider(null);
+                        setListViewHeightBasedOnItems(listView);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(LOG_TAG, databaseError.toString());
+                    }
+                });
+
 
             }
 
