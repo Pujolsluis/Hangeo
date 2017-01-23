@@ -28,18 +28,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Oficina on 16/01/2017.
+ * Created by Oficina on 23/01/2017.
  */
 
-public class PlanCreationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class PlanDetailsModifyActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private static final String LOG_TAG = PlanCreationActivity.class.getSimpleName();
-
+    private static final String LOG_TAG = PlanDetailsModifyActivity.class.getSimpleName();
     private Context context = this;
     private Button mFinishActivityButton;
     private TimePicker mTimePicker;
@@ -55,31 +57,25 @@ public class PlanCreationActivity extends AppCompatActivity implements AdapterVi
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mPlanDatabaseReference;
     private DatabaseReference mProfileDatabaseReference;
+    private String mPlanKey;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_plan);
+        setContentView(R.layout.plan_details_edit_plan);
+
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        mUserID = (String) getIntent().getExtras().get("mUserID");
+        mPlanKey = (String) getIntent().getExtras().get(PlanDetailsActivity.EXTRA_PLAN_KEY);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mPlanDatabaseReference = mFirebaseDatabase.getReference().child("plans");
         mProfileDatabaseReference = mFirebaseDatabase.getReference().child("userProfiles");
 
-//        mFinishActivityButton = (Button) findViewById(R.id.finish_activity_button);
-//
-//        mFinishActivityButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                finish();
-//            }
-//        });
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        Spinner spinner = (Spinner) findViewById(R.id.modify_plan_chooseImage_spinner);
+        Spinner spinner = (Spinner) findViewById(R.id.modify_plan_chooseImage_spinner_details);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -102,6 +98,36 @@ public class PlanCreationActivity extends AppCompatActivity implements AdapterVi
 
         Button saveButton = (Button) findViewById(R.id.modify_plan_button);
 
+        mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                List<String> locations = new ArrayList<String>();
+
+                PlanTemp mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
+
+                mPlanName.setText(mPlanTemp.getmTitle());
+                mPlanDescription.setText(mPlanTemp.getmDescription());
+                Calendar tempCalendar = Calendar.getInstance();
+                tempCalendar.setTimeInMillis(mPlanTemp.getmCreationDate());
+
+
+                SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM");
+                String dateString = formatter.format(mPlanTemp.getmCreationDate());
+
+                mDatePickerEditText.setText(dateString);
+
+                formatter = new SimpleDateFormat("h:mm a");
+                dateString = formatter.format(mPlanTemp.getmCreationDate());
+                mTimePickerEditText.setText(dateString);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(LOG_TAG, databaseError.toString());
+            }
+        });
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,35 +137,35 @@ public class PlanCreationActivity extends AppCompatActivity implements AdapterVi
         });
 
 
-       mDatePickerEditText.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View view) {
-               // TODO Auto-generated method stub
-               //To show current date in the datepicker
-               Calendar mcurrentDate = Calendar.getInstance();
-               int calendarYear = mcurrentDate.get(Calendar.YEAR);
-               int calendarMonth = mcurrentDate.get(Calendar.MONTH);
-               int calendarDay = mcurrentDate.get(Calendar.DAY_OF_MONTH);
+        mDatePickerEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO Auto-generated method stub
+                //To show current date in the datepicker
+                Calendar mcurrentDate = Calendar.getInstance();
+                int calendarYear = mcurrentDate.get(Calendar.YEAR);
+                int calendarMonth = mcurrentDate.get(Calendar.MONTH);
+                int calendarDay = mcurrentDate.get(Calendar.DAY_OF_MONTH);
 
-               DatePickerDialog mDatePicker;
-               mDatePicker = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
+                DatePickerDialog mDatePicker;
+                mDatePicker = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
 
-                   public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
-                       // TODO Auto-generated method stub
+                    public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
+                        // TODO Auto-generated method stub
                     /*      Your code   to get date and time    */
-                       selectedMonth = selectedMonth + 1;
+                        selectedMonth = selectedMonth + 1;
 
-                       mYear = selectedYear;
-                       mMonth = selectedMonth;
-                       mDay = selectedDay;
+                        mYear = selectedYear;
+                        mMonth = selectedMonth;
+                        mDay = selectedDay;
 
-                       mDatePickerEditText.setText("" + selectedDay + "/" + selectedMonth + "/" + selectedYear);
-                   }
-               }, calendarYear, calendarMonth, calendarDay);
-               mDatePicker.setTitle("Select Date");
-               mDatePicker.show();
-           }
-       });
+                        mDatePickerEditText.setText("" + selectedDay + "/" + selectedMonth + "/" + selectedYear);
+                    }
+                }, calendarYear, calendarMonth, calendarDay);
+                mDatePicker.setTitle("Select Date");
+                mDatePicker.show();
+            }
+        });
 
         mTimePickerEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,7 +215,7 @@ public class PlanCreationActivity extends AppCompatActivity implements AdapterVi
             String planDescription = String.valueOf(mPlanDescription.getText());
 
             Log.d(LOG_TAG, "Plan Name: " + planName + "\nPlan Description: " + planDescription + "\nPlan Time: " + planTime
-                            + "\nPlan Time Human Readible: " + tempCalendar.getTime().toString() + "\nUserId: " + mUserID);
+                    + "\nPlan Time Human Readible: " + tempCalendar.getTime().toString() + "\nUserId: " + mUserID);
 
             updateDatabase();
 
@@ -207,57 +233,45 @@ public class PlanCreationActivity extends AppCompatActivity implements AdapterVi
 
             if(TextUtils.isEmpty(mDatePickerEditText.getText()))
                 inputLayout = (TextInputLayout) findViewById(R.id.modify_plan_pick_date_inputLayout);
-                inputLayout.setError("You need to pick a date");
+            inputLayout.setError("You need to pick a date");
 
             if(TextUtils.isEmpty(mTimePickerEditText.getText()))
                 inputLayout = (TextInputLayout) findViewById(R.id.create_plan_pick_time_inputLayout);
-                inputLayout.setError("You need to pick a time");
+            inputLayout.setError("You need to pick a time");
 
         }
     }
 
     private void updateDatabase() {
 
-        Calendar tempCalendar = Calendar.getInstance();
+        final Calendar tempCalendar = Calendar.getInstance();
         tempCalendar.set(mYear, mMonth, mDay, mHour, mMinutes);
 
-        final PlanTemp newPlan = new PlanTemp(mUserID, mPlanName.getText().toString(), tempCalendar.getTimeInMillis());
-        newPlan.setmDescription(String.valueOf(mPlanDescription.getText()));
-        newPlan.setmImageBannerResource(mImageResourceForPlan);
-        newPlan.addPlanMembers(mUserID);
+        mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get plan information
+                PlanTemp mPlanTemp = dataSnapshot.getValue(PlanTemp.class);
 
-        DatabaseReference dbRef = mPlanDatabaseReference.push();
-        final String planKEY = dbRef.getKey();
+                mPlanTemp.setmTitle(mPlanName.getText().toString());
+                mPlanTemp.setmDescription(mPlanDescription.getText().toString());
+                mPlanTemp.setmCreationDate(tempCalendar.getTimeInMillis());
+                mPlanTemp.setmImageBannerResource(mImageResourceForPlan);
 
-        newPlan.setmPlanKey(planKEY);
-        dbRef.setValue(newPlan);
+                Map<String, Object> profileUpdatedValues = mPlanTemp.toMap();
 
-        mProfileDatabaseReference.child(mUserID).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // Get user information
-                        UserProfile userProfile = dataSnapshot.getValue(UserProfile.class);
-                        if(userProfile != null) {
+                Map<String, Object> childUpdates = new HashMap<>();
 
-                            userProfile.addPlan(planKEY);
+                childUpdates.put(mPlanKey, profileUpdatedValues);
+                mPlanDatabaseReference.updateChildren(childUpdates);
 
-                            Map<String, Object> profileUpdatedValues = userProfile.toMap();
+            }
 
-                            Map<String, Object> childUpdates = new HashMap<>();
-
-                            childUpdates.put(mUserID, profileUpdatedValues);
-                            mProfileDatabaseReference.updateChildren(childUpdates);
-                        }else{
-                            Log.d(LOG_TAG, mUserID);
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e(LOG_TAG, databaseError.toString());
-                    }
-                });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(LOG_TAG, databaseError.toString());
+            }
+        });
     }
 
     @Override

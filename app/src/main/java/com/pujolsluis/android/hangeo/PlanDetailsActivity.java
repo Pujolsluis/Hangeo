@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -57,6 +58,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     public static final String EXTRA_PLAN_KEY = "plan_key";
     public static final String EXTRA_PLAN_IMAGE_RESOURCE = "plan_imageResource";
     public static final int MAP_SELECT_LOCATIONS = 1;
+    public static final int EDIT_PLAN_DETAILS = 2;
     public static final String LOG_TAG = PlanDetailsActivity.class.getSimpleName();
     private int mPlanImageResource;
     private FloatingActionButton mFloatingActionButton;
@@ -89,7 +91,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         setContentView(R.layout.activity_plan_details);
 
         Intent intent = getIntent();
-        final String cheeseName = intent.getStringExtra(EXTRA_NAME);
+        final String planName = intent.getStringExtra(EXTRA_NAME);
         mPlanKey = intent.getStringExtra(EXTRA_PLAN_KEY);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -262,7 +264,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(cheeseName);
+        collapsingToolbar.setTitle(planName);
 
 
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.plan_details_action_button);
@@ -274,6 +276,17 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
                 Intent intent = new Intent(context, MapsActivity.class);
                 intent.putExtra(EXTRA_PLAN_KEY, mPlanKey);
                 startActivityForResult(intent, MAP_SELECT_LOCATIONS);
+            }
+        });
+
+        Button editButton = (Button) findViewById(R.id.plan_details_edit_button);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context context = view.getContext();
+                Intent intent = new Intent(context, PlanDetailsModifyActivity.class);
+                intent.putExtra(EXTRA_PLAN_KEY, mPlanKey);
+                startActivityForResult(intent, EDIT_PLAN_DETAILS);
             }
         });
 
@@ -579,6 +592,13 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         if(requestCode == MAP_SELECT_LOCATIONS){
             if(resultCode == RESULT_OK){
                     Log.d(LOG_TAG, "Im ok! :3");
+            }else{
+
+            }
+        }
+        if(requestCode == EDIT_PLAN_DETAILS){
+            if(resultCode == RESULT_OK){
+                Log.d(LOG_TAG, "I edited ok! :3");
             }else{
 
             }

@@ -39,7 +39,7 @@
                     android:src="@drawable/ic_event_black_48dp"/>
 
                 <TextView
-                    android:id="@+id/create_plan_textView"
+                    android:id="@+id/modify_plan_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Create Plan"
@@ -54,7 +54,7 @@
                     android:id="@+id/form_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/create_plan_textView"
+                    android:layout_below="@id/modify_plan_textView"
                     android:orientation="vertical"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
@@ -66,7 +66,7 @@
                         android:id="@+id/create_plan_name_inputLayout"
                         >
                         <EditText
-                            android:id="@+id/create_plan_name_textView"
+                            android:id="@+id/modify_plan_name_textView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Plan Name"
@@ -80,7 +80,7 @@
                         android:layout_height="wrap_content"
                         >
                         <EditText
-                            android:id="@+id/create_plan_description_textView"
+                            android:id="@+id/modify_plan_description_textView"
                             android:layout_width="match_parent"
                             android:layout_height="80dp"
                             android:hint="Description"
@@ -113,10 +113,10 @@
                             <android.support.design.widget.TextInputLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:id="@+id/create_plan_pick_date_inputLayout"
+                                android:id="@+id/modify_plan_pick_date_inputLayout"
                                 >
                                 <EditText
-                                    android:id="@+id/pick_date"
+                                    android:id="@+id/modify_plan_pick_date_editText"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:hint="Select Date"
@@ -147,7 +147,7 @@
                                 android:id="@+id/create_plan_pick_time_inputLayout"
                                 >
                             <EditText
-                                android:id="@+id/pick_time"
+                                android:id="@+id/modify_plan_time_value_editText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Select Time"
@@ -158,14 +158,14 @@
                         </LinearLayout>
                     </LinearLayout>
                     <Spinner
-                        android:id="@+id/create_plan_chooseImage_spinner"
+                        android:id="@+id/modify_plan_chooseImage_spinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
                     </Spinner>
                 </LinearLayout>
 
             <Button
-                android:id="@+id/create_plan_button"
+                android:id="@+id/modify_plan_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"

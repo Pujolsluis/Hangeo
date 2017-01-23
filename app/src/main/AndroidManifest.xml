@@ -66,6 +66,9 @@
 
         <activity android:name=".PlanCreationActivity"
             android:parentActivityName=".MainActivity"/>
+
+        <activity android:name=".PlanDetailsModifyActivity"
+            android:parentActivityName=".PlanDetailsActivity"/>
     </application>
 
 </manifest>

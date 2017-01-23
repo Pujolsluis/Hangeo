@@ -16,6 +16,16 @@
     <string name="plan_details_estimated_cost_title">Estimated Cost</string>
     <string name="plan_details_estimated_cost_value">$$$</string>
 
+    <!--START OF MODIFY MAP DETAILS LAYOUT-->
+      <string name="plan_details_modify_title">Edit Plan</string>
+      <string name="plan_details_modify_date_title">Date:</string>
+      <string name="plan_details_modify_date_value">Select Date</string>
+      <string name="plan_details_modify_time_title">Time:</string>
+      <string name="plan_details_modify_time_value">Select Time</string>
+      <string name="plan_details_modify_save_button">Save</string>
+
+    <!--END OF MODIFY MAP DETAILS LAYOUT-->
+
   <!--END OF PLAN DETAILS LAYOUT Strings-->
 
 

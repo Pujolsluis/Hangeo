@@ -26,7 +26,7 @@ public class PlanAdapter extends ArrayAdapter<PlanTemp> {
         }
 
         ImageView photoImageView = (ImageView) convertView.findViewById(R.id.plan_background_header);
-        TextView messageTextView = (TextView) convertView.findViewById(R.id.create_plan_name_textView);
+        TextView messageTextView = (TextView) convertView.findViewById(R.id.modify_plan_name_textView);
         TextView authorTextView = (TextView) convertView.findViewById(R.id.plan_locations_textView);
 
         PlanTemp plan = getItem(position);
