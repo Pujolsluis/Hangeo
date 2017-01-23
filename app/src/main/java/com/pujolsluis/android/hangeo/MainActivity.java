@@ -82,9 +82,7 @@ public class MainActivity extends AppCompatActivity{
         mNavDrawerHeaderFirstNameLastName = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_firstName_lastName);
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        if (mViewPager != null) {
-            setupViewPager(mViewPager);
-        }
+
 
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
@@ -108,6 +106,9 @@ public class MainActivity extends AppCompatActivity{
                     //user is signed in
                     onSignedInInitialize(user);
                     setupDrawerContent(mNavigationView);
+                    if (mViewPager != null) {
+                        setupViewPager(mViewPager);
+                    }
 
                 }else{
                     onSignoutCleanUp();
