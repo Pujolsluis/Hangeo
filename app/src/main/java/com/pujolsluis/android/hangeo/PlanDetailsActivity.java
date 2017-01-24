@@ -154,14 +154,14 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
                                 locationPoints.add(tempPoint);
                                 MarkerOptions tempMarker = new MarkerOptions().position(tempPoint).title(mPlanTemp.getmPlanLocationsNames().get(i));
                                 mGoogleMap.addMarker(tempMarker);
+                                updateMapBounds(locationPoints);
+                                List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
+                                mPolyLine.setPoints(polyLinePoints);
                             }
                         }else{
                             locations.add("No destinations");
                         }
 
-                        updateMapBounds(locationPoints);
-                        List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
-                        mPolyLine.setPoints(polyLinePoints);
 
 
                         //Code for Locations List View
@@ -223,14 +223,15 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
                                 locationPoints.add(tempPoint);
                                 MarkerOptions tempMarker = new MarkerOptions().position(tempPoint).title(mPlanTemp.getmPlanLocationsNames().get(i));
                                 mGoogleMap.addMarker(tempMarker);
+                                updateMapBounds(locationPoints);
+                                List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
+                                mPolyLine.setPoints(polyLinePoints);
                             }
                         }else{
                             locations.add("No destinations");
                         }
 
-                        updateMapBounds(locationPoints);
-                        List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
-                        mPolyLine.setPoints(polyLinePoints);
+
 
 
                         //Code for Locations List View

@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity{
 
 
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
-        mTabLayout.setupWithViewPager(mViewPager);
+
 
         mCreatePlanButton = (FloatingActionButton) findViewById(R.id.fab_create_plan);
 
@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity{
                     setupDrawerContent(mNavigationView);
                     if (mViewPager != null) {
                         setupViewPager(mViewPager);
+                        mTabLayout.setupWithViewPager(mViewPager);
                     }
 
                 }else{
