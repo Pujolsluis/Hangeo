@@ -305,11 +305,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mSelectedMarkerslist.add(tempMarkerObject);
                         mSelectedMarkersMap.put(tempMarkerObject, i);
 
-                        updateMapBounds();
-                        List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
-                        mPolyLine.setPoints(polyLinePoints);
-
                     }
+                    List<LatLng> polyLinePoints = PolyUtil.decode(mPlanTemp.getmOverviewPolyline());
+                    mPolyLine.setPoints(polyLinePoints);
+                    updateMapBounds();
                 }else{
                     locations.add("No destinations");
                 }
