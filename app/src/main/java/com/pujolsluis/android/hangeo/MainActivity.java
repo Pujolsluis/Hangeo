@@ -58,10 +58,14 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Initializing the Firebase instances for the auth system and the database
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+
+        //Firebase Database Reference for the user profiles
         mProfileDatabaseReference = mFirebaseDatabase.getReference().child("userProfiles");
 
+        //Initializing the Toolbar for the MainActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity{
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-
+        //Initializing the drawer content
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         if (mNavigationView != null) {
             setupDrawerContent(mNavigationView);
@@ -83,10 +87,11 @@ public class MainActivity extends AppCompatActivity{
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
 
-
+        //Initializing the tabs layout
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
 
 
+        //Initializing the create plan button
         mCreatePlanButton = (FloatingActionButton) findViewById(R.id.fab_create_plan);
 
         mCreatePlanButton.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +103,7 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        //Setting the auth system listener
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -122,10 +128,12 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
+    //Clean up for the signout of an account
     private void onSignoutCleanUp() {
         mUser = null;
     }
 
+    //Initializing the variables with the current logged in user information
     private void onSignedInInitialize(FirebaseUser user) {
         mUser = user;
         mUserID = user.getUid();
@@ -138,6 +146,7 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
+    //Menu options selected
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -158,6 +167,7 @@ public class MainActivity extends AppCompatActivity{
         viewPager.setAdapter(adapter);
     }
 
+    //Setting up the drawer content of the navigation view
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -183,6 +193,7 @@ public class MainActivity extends AppCompatActivity{
                 });
     }
 
+    //Custom adapter for the list view of plans
     static class Adapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragments = new ArrayList<>();
         private final List<String> mFragmentTitles = new ArrayList<>();
@@ -212,6 +223,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    //OnActivity result for the MainActivity, here you can respond to each result you receive from other activities
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -256,12 +268,14 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    //Attaching the Auth listener when the app is resumend.
     @Override
     protected void onResume() {
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         super.onStart();
     }
 
+    //Detaching the auth listener to save resources when the app is paused
     @Override
     protected void onPause() {
         if(mFirebaseAuth != null){
