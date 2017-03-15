@@ -63,7 +63,7 @@ import java.util.Map;
 
 import static com.pujolsluis.android.hangeo.R.id.map;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
+public class   MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
         ActivityCompat.OnRequestPermissionsResultCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LoaderManager.LoaderCallbacks<List<Route>>{
 
@@ -81,7 +81,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private View mLayout;
     //Google API Cliente to retrieve user location data
     private GoogleApiClient mGoogleApiClient;
-    //FirstOnStart
+    //First OnStart of the activity
     private Boolean mFirstOnStart = true;
     //Last Marker on long click
     private Marker mLastMarker;
@@ -90,11 +90,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private Marker mLastPlaceMarker;
 
+    //Collections of markers and its LatLng Points in the map
     private HashMap<Marker, Integer> mSelectedMarkersMap = new HashMap<>();
     private ArrayList<Marker> mSelectedMarkerslist = new ArrayList<>();
     private ArrayList<LatLng> mPolyLineSelectedPointList = new ArrayList<>();
 
-    //Planel Layout
+    //Panel Layout
     private SlidingUpPanelLayout mSlidingPanelLayout;
 
     //Panel Header Button
@@ -115,6 +116,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Directions API Base Request URL
     private static final String DIRECTIONSAPI_REQUEST_URL = "https://maps.googleapis.com/maps/api/directions/json";
 
+    //Firebase Objects
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mPlansFirebaseReference;
     private String mPlanKey;
@@ -131,6 +133,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        //Initialization of the Drawer menu
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_map);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_map);
@@ -167,6 +170,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Initialize Sliding Panel
         initializeSlidingPanel();
 
+        //Add Location Button
         mPanelButton = (ImageButton) findViewById(R.id.add_location_to_plan);
 
         // Create an instance of GoogleAPIClient.
@@ -187,12 +191,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mPlansFirebaseReference = mFirebaseDatabase.getReference().child("plans");
 
+        //Save Plan Button
         Button saveButton = (Button) findViewById(R.id.activity_map_save_button);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //Saving Plan information
                 mPlansFirebaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -201,6 +206,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         List<CustomLatLngPoints> planSelectedPointList = new ArrayList<CustomLatLngPoints>();
                         List<String> planSelectedLocationsNames = new ArrayList<String>();
+
                         for(int i=0; i<mPolyLineSelectedPointList.size(); i++){
                             CustomLatLngPoints newPoint = new CustomLatLngPoints();
                             LatLng tempLatLng = mPolyLineSelectedPointList.get(i);
@@ -235,6 +241,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
+                //Return result to MainActivity
                 setResult(RESULT_OK);
                 finish();
             }
