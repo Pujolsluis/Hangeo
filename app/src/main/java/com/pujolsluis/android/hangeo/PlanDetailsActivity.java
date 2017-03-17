@@ -54,12 +54,14 @@ import static com.pujolsluis.android.hangeo.R.id.plan_details_map;
 public class PlanDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private Context context = this;
+    //Defining the intent extras for the MapsActivity
     public static final String EXTRA_NAME = "plan_name";
     public static final String EXTRA_PLAN_KEY = "plan_key";
     public static final String EXTRA_PLAN_IMAGE_RESOURCE = "plan_imageResource";
     public static final int MAP_SELECT_LOCATIONS = 1;
     public static final int EDIT_PLAN_DETAILS = 2;
     public static final String LOG_TAG = PlanDetailsActivity.class.getSimpleName();
+    //Plan Information variables
     private int mPlanImageResource;
     private FloatingActionButton mFloatingActionButton;
     private String mPlanKey;
@@ -76,15 +78,19 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     //View to get the main activity layout and use it in the permission method
     private View mLayout;
 
+    //Defining the recycler view for the plan members list view
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    //Firebase Database and database references variables
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mPlanMembersReference;
     private DatabaseReference mUserProfilesReference;
     private DatabaseReference mPlanDatabaseReference;
     private DatabaseReference mPlanSpecificReference;
+
+    //Plan route overview polyline
     private Polyline mPolyLine;
 
     @Override
@@ -92,21 +98,24 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plan_details);
 
+        //Declaring the intent extras for the MapsActivity
         Intent intent = getIntent();
         mPlanName = intent.getStringExtra(EXTRA_NAME);
         mPlanKey = intent.getStringExtra(EXTRA_PLAN_KEY);
 
+        //Initializing Database references
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mPlanMembersReference = mFirebaseDatabase.getReference().child("plans").child(mPlanKey).child("mPlanMembers");
         mUserProfilesReference = mFirebaseDatabase.getReference().child("userProfiles");
         mPlanDatabaseReference = mFirebaseDatabase.getReference().child("plans");
         mPlanSpecificReference = mFirebaseDatabase.getReference().child("plans").child(mPlanKey);
 
+        //Obtaining plan UI Elements
         mPlanDescription = (TextView) findViewById(R.id.plan_details_description_textView);
         mPlanTimeValue = (TextView) findViewById(R.id.plan_details_time_value);
         mPlanEstimatedCostValue = (TextView) findViewById(R.id.plan_details_estimated_cost_value);
 
-
+        //Initializing the toolbar
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -114,6 +123,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         collapsingToolbar =  (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(mPlanName);
 
+        //Attaching child event listener for the plan
         mPlanSpecificReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -270,6 +280,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
             }
         });
 
+        //Initializing the floating action button to start the MapsActivity
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.plan_details_action_button);
 
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -294,7 +305,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         });
 
 
-
+        //TODO: VERIFY THIS METHOD PROBABLE CAUSE OF loadBackdrop bug in app
         mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -352,20 +363,19 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
 
 
-        //Members Recycler view
+        //Initializing members Recycler view
         mRecyclerView = (RecyclerView) findViewById(R.id.plan_details_members_recycler_view);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
+        // Initializing the linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
-        // specify an adapter (see also next example)
-
+        //Especifying the adapter for the members recycler view
         mAdapter = new FirebaseRecyclerAdapter<Boolean, PlanDetailsActivity.PlanMembersHolder>(Boolean.class, R.layout.plan_details_members_list_item , PlanDetailsActivity.PlanMembersHolder.class, mPlanMembersReference) {
             @Override
             public void populateViewHolder(final PlanDetailsActivity.PlanMembersHolder planViewHolder, Boolean planItem, int position) {
@@ -402,7 +412,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         };
 
 
-
+        //Attaching adapter to the recycler
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -418,6 +428,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
 
     }
 
+    //Load the image backdrop for the plan details activity
     private void loadBackdrop() {
         final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
         Glide.with(this)
