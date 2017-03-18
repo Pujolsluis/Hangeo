@@ -443,6 +443,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
         return true;
     }
 
+    //Initializing the plan details map route overview
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
@@ -471,6 +472,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     }
 
 
+    //Adapter for the locations list view
     public class LocationsAdapter extends ArrayAdapter<String> {
         public LocationsAdapter(Context context, List<String> users) {
             super(context, 0, users);
@@ -561,6 +563,7 @@ public class PlanDetailsActivity extends AppCompatActivity implements OnMapReady
     @Override
     protected void onResume() {
         super.onResume();
+        //Attaching child listener for plan details activity
         mPlanDatabaseReference.child(mPlanKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
