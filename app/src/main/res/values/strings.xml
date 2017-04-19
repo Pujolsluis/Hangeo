@@ -88,4 +88,11 @@
   </string-array>
   <!--END OF SPINNER options for create plan screen-->
 
+
+  <!--START of Under Construction screen strings-->
+  <string name="titleUnderCons">Opss!</string>
+  <string name="descriptLine1UnderCons">We are sorry but it seems that,</string>
+  <string name="descriptLine2UnderCons">this section is </string>
+  <string name="descriptLine2UnderConsUnder">underdevelopment.</string>
+  <!--END of Under Construction screen strings-->
 </resources>
