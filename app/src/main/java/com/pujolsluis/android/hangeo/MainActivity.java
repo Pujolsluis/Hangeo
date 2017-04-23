@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity{
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()){
                             case R.id.nav_home:
-                                Intent intent = new Intent(context, MapsActivity.class);
+                                Intent intent = new Intent(context, UnderConsActivity.class);
                                 mDrawerLayout.closeDrawer(GravityCompat.START);
                                 context.startActivity(intent);
                                 return true;
@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-        super.onStart();
+        super.onResume();
     }
 
     //Detaching the auth listener to save resources when the app is paused
@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity{
         if(mFirebaseAuth != null){
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-        super.onStop();
+        super.onPause();
     }
 
 

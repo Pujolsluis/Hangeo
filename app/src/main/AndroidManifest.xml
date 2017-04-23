@@ -24,6 +24,8 @@
         android:theme="@style/AppTheme"
         android:name="android.support.multidex.MultiDexApplication">
 
+        <activity android:name=".UnderConsActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".WelcomeScreenActivity"/>
 
         <activity android:name=".MainActivity">
