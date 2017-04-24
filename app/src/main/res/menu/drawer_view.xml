@@ -38,9 +38,11 @@
     <item android:title="Contact Us">
         <menu>
             <item
+                android:id="@+id/nav_hangeo_web"
                 android:icon="@drawable/ic_dashboard"
                 android:title="Hangeo.com" />
             <item
+                android:id="@+id/nav_support"
                 android:icon="@drawable/ic_forum"
                 android:title="Support" />
             <item

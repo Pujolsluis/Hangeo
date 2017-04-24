@@ -174,6 +174,10 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()){
+                            case R.id.nav_friends:
+                            case R.id.nav_discussion:
+                            case R.id.nav_hangeo_web:
+                            case R.id.nav_support:
                             case R.id.nav_home:
                                 Intent intent = new Intent(context, UnderConsActivity.class);
                                 mDrawerLayout.closeDrawer(GravityCompat.START);
