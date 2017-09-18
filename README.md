@@ -11,7 +11,7 @@ We decided to make our application in a technology we didn't knew, or only had t
 - Language: [Java]
 - Framework: [Android]
 - Design Pattern: [Material Design]
-- **Google API's**:
+### Google API's:
 - [Google Maps]
 - [Google Places]
 - [Firebase] 
