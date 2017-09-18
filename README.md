@@ -2,7 +2,7 @@
 
 This is the final project for our "Discrete Math II" course in our university, we had to develop a full application implementing the concept of Graph Theory into real world problems and make an application that can be usefull for our market.
 
-Our idea for the final project was to make an app, that allows our users to create they're hang out plans, allowing them to select different destinations and create the best route between them, giving them usefull info about time they might need between each destination and an estimate of how much money they might have to pay to have a good time in the hang out plans, but our primary concer was giving our user (The plan maker) the abilite to make a plan, update it and share it easily between his friends and family without loosing any important information on the way.
+Our idea for the final project was to make an app, that allows our users to create they're hang out plans, allowing them to select different destinations and create the best route between them, giving them usefull info about time they might need between each destination and an estimate of how much money they might have to pay to have a good time in the hang out plans, but our primary concer was giving our user (The plan maker) the ability to make a plan, update it and share it easily between his friends and family without losing any important information on the way.
 
 ### Application
 We decided to make our application in a technology we didn't knew, or only had the basics so we could do our project but at the same time learn some new coding skills. because it would be really boring to do all that theoric work and not have a little fun learning something new right? :P
